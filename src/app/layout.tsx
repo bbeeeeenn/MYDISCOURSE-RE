@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "@/components/AuthSessionProvider";
 import clsx from "clsx";
 import { ToastContainer } from "react-toastify";
+import { Outfit } from "next/font/google";
 
 const outfitFont = Outfit({
   variable: "--font-outfit",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={clsx("h-full antialiased", outfitFont.variable)}>
-      <body className="flex min-h-full flex-col">
-        <ToastContainer />
+      <body className="bg-base-100 font-outfit flex min-h-full flex-col select-none">
+        <ToastContainer toastClassName={"select-none"} />
         <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>

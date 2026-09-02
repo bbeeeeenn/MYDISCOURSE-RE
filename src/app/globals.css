@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-outfit: var(--font-outfit);
 
   --color-base-100: #ffffff; /* lightest surface */
