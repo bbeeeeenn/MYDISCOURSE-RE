@@ -13,3 +13,11 @@
   --color-primary-content: #003300;
   --color-secondary: #fe9800;
 }
+
+button {
+  cursor: pointer;
+}
+
+input {
+  outline: none;
+}

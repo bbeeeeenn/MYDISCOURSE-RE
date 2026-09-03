@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -49,16 +49,17 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  id_number     String    @unique
-  name          String?
   email         String?   @unique
-  year_level    Int?
   emailVerified DateTime? @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
-  role          Role      @default(STUDENT)
+
+  name          String?
+  id_number     String?    @unique
+  year_level    Int?
   password      String? //must be hashed
+  role          Role      @default(STUDENT)
 
   @@index([role])
   @@map("users")

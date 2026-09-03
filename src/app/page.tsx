@@ -1,3 +1,4 @@
+import { roomsPage } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,7 +18,7 @@ export default function Home() {
             Help
           </Link>
           <Link
-            href={"/"}
+            href={roomsPage}
             className="text-base-100 bg-base-300 rounded-full px-4 py-2 text-xs sm:text-sm md:text-base"
           >
             Browse Rooms
@@ -36,7 +37,13 @@ export default function Home() {
           </p>
         </div>
         <div className="max-w-100 lg:max-w-full">
-          <Image src={"/csu_duo_statue.png"} alt="" width={500} height={500} />
+          <Image
+            src={"/csu_duo_statue.png"}
+            loading="eager"
+            alt=""
+            width={500}
+            height={500}
+          />
         </div>
       </div>
 
