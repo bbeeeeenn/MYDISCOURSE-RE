@@ -1,6 +1,6 @@
 export default function RoomsPage() {
   return (
-    <div className="min-h-[200svh]">
+    <div>
       <button>Rooms</button>
     </div>
   );

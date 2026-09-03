@@ -2,14 +2,14 @@
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { signIn } from "@/lib/auth";
 
 export async function registerUser(
   email: string,
   password: string,
-  name: string,
-  id_number: string,
-  year_level: number,
 ): ActionResult<{ message: string }> {
+  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedPassword = password.trim();
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing)
@@ -17,12 +17,15 @@ export async function registerUser(
 
     await prisma.user.create({
       data: {
-        email,
-        year_level,
-        id_number,
-        name,
-        password: await bcrypt.hash(password, 10),
+        email: normalizedEmail,
+        password: await bcrypt.hash(normalizedPassword, 10),
       },
+    });
+
+    await signIn("credentials", {
+      email: normalizedEmail,
+      password: normalizedPassword,
+      redirect: false,
     });
 
     return { ok: true, data: { message: "You are registered successfully!" } }; // suggest message

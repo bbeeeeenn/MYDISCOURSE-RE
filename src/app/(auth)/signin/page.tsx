@@ -1,6 +1,14 @@
 "use client";
 
-import { Eye, EyeClosed, Lock, CircleArrowLeft, Mail } from "lucide-react";
+import {
+  Eye,
+  EyeClosed,
+  Lock,
+  CircleArrowLeft,
+  Mail,
+  LoaderCircle,
+  LogIn,
+} from "lucide-react";
 import { type ChangeEvent, useState, useActionState } from "react";
 import Link from "next/link";
 import { roomsPage, signUpPage } from "@/constants";
@@ -19,12 +27,10 @@ export default function LoginForm() {
     setInfos((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const loginAction = async (_: unknown, formData: FormData) => {
-    if (isPending) return;
     const res = await login(formData);
-    toast(res.ok ? res.data.message : res.message, {
-      type: res.ok ? "success" : "error",
-    });
-    if (res.ok) window.location.reload();
+    if (!res.ok) {
+      toast.error(res.message);
+    } else window.location.reload();
   };
 
   const [, formAction, isPending] = useActionState(loginAction, undefined);
@@ -32,6 +38,9 @@ export default function LoginForm() {
   return (
     <form
       action={formAction}
+      onSubmit={(e) => {
+        if (isPending) e.preventDefault();
+      }}
       className="bg-base-200 text-primary-content fixed inset-x-3 inset-y-0 m-auto flex h-fit max-w-100 flex-col justify-center rounded-lg px-7 py-10"
     >
       <h2 className="text-center text-2xl font-bold">Sign In</h2>
@@ -82,8 +91,15 @@ export default function LoginForm() {
 
       <button
         type="submit"
-        className="font-outfit mt-7 rounded-md bg-yellow-500 p-2 font-semibold"
+        className="font-outfit mt-7 flex items-center justify-center gap-2 rounded-md bg-yellow-500 p-2 font-semibold"
       >
+        <span className="">
+          {isPending ? (
+            <LoaderCircle size={20} className="animate-spin" />
+          ) : (
+            <LogIn size={20} />
+          )}
+        </span>
         Log in
       </button>
       <div className="mt-3 flex flex-row justify-center">

@@ -1,6 +1,7 @@
 export const landingPage = "/";
 export const signInPage = "/signin";
 export const signUpPage = "/signup";
+
 export const roomsPage = "/rooms";
 export const homePage = "/home";
 export const myReservationsPage = "/my-reservations";
@@ -10,5 +11,5 @@ export const logsPage = "/logs";
 export const scanPage = "/scan";
 export const reportsPage = "/reports";
 export const reservationsPage = "/reservations";
-export const accountsPage = "/accounts";
+export const usersPage = "/users";
 export const accountPage = "/account";

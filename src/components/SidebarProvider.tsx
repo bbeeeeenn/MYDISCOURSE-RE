@@ -10,7 +10,7 @@ import {
   scanPage,
   reportsPage,
   reservationsPage,
-  accountsPage,
+  usersPage,
   accountPage,
   signInPage,
   landingPage,
@@ -71,7 +71,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
     { icon: Scroll, label: "Logs", link: logsPage },
     { icon: StickyNote, label: "Reports", link: reportsPage },
     { icon: Bell, label: "Notifications", link: notificationsPage },
-    { icon: Users, label: "Accounts", link: accountsPage },
+    { icon: Users, label: "Users", link: usersPage },
     { icon: CircleUserRound, label: "Account", link: accountPage },
   ],
 };
@@ -117,24 +117,30 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
           <p className="truncate font-medium">
             {items.find((i) => pathname.includes(i.link))?.label}
           </p>
+          {session.status === "authenticated" && (
+            <span className="text-base-100 ml-auto inline-block rounded-full bg-green-500 px-2 py-0.5 text-xs">
+              {session.data.user.role}
+            </span>
+          )}
         </div>
 
         {/* Sidebar */}
         <aside
           className={clsx(
-            "pointer-events-auto flex w-full grow flex-col items-stretch border-r-amber-500 bg-[#d9d9d9] transition-[translate] sm:w-50 sm:border-r-4",
+            "pointer-events-auto flex w-full grow flex-col items-stretch border-r-amber-500 bg-[#d9d9d9] transition-[translate] sm:w-53 sm:border-r-4",
             sidebarOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          {items.map((item) => {
+          {items.map((item, i) => {
             const isActive = pathname.includes(item.link);
             return (
               <Link
                 key={item.label + item.link}
                 href={item.link}
                 className={clsx(
-                  "flex items-center gap-2 px-3 py-2",
+                  "flex items-center gap-2 px-3 py-3",
                   isActive && "pointer-events-none bg-gray-500 text-white",
+                  i === items.length - 1 && "mt-auto",
                 )}
               >
                 <span>
@@ -154,8 +160,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
       <main
         className={clsx(
-          "pt-14 transition-[padding-left]",
-          sidebarOpen && "sm:pl-50",
+          "relative pt-14 transition-[padding-left]",
+          sidebarOpen && "sm:pl-53",
         )}
       >
         {children}
