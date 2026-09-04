@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import CreateButton from "./_components/CreateButton";
-import getRooms from "@/data-access-layer/rooms";
+import getRooms from "@/data-access-layer/room/rooms";
 
 async function Suspended() {
    const rooms = await getRooms();
@@ -14,7 +14,7 @@ async function Suspended() {
          {rooms.map((room) => (
             <Link
                key={room.id}
-               href={roomsPage + `/${room.room_name}`}
+               href={roomsPage + `/${room.id}`}
                className="flex h-45 overflow-hidden rounded-md border border-gray-400 bg-[#d9d9d9] shadow-md"
             >
                {room.image_url && (

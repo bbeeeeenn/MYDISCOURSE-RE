@@ -1,7 +1,12 @@
 import { SidebarProvider } from "@/components/SidebarProvider";
+import { Suspense } from "react";
 
 export default function Layout({
-  children,
+   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return <SidebarProvider>{children}</SidebarProvider>;
+   return (
+      <Suspense fallback={null}>
+         <SidebarProvider>{children}</SidebarProvider>
+      </Suspense>
+   );
 }

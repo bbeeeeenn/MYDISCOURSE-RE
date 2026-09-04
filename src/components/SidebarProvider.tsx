@@ -80,7 +80,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
    const pathname = usePathname();
    const session = useSession();
 
-   const [sidebarOpen, setSidebarOpen] = useState(false);
+   const [mobile, setMobile] = useState(false);
+   const [desktop, setDesktop] = useState(true);
 
    const items: SidebarItem[] =
       session.status === "authenticated"
@@ -94,14 +95,23 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
          <nav
             className={clsx(
                "fixed inset-0 z-999 flex flex-col items-start",
-               sidebarOpen
+               mobile
                   ? "pointer-events-auto sm:pointer-events-none"
                   : "pointer-events-none",
             )}
          >
             {/* Topbar */}
             <div className="pointer-events-auto z-100 flex items-center gap-2 self-stretch bg-[#d9d9d9] px-4 py-3 shadow-md">
-               <button onClick={() => setSidebarOpen((prev) => !prev)}>
+               <button
+                  onClick={() => setMobile((prev) => !prev)}
+                  className="sm:hidden"
+               >
+                  <Menu />
+               </button>
+               <button
+                  onClick={() => setDesktop((prev) => !prev)}
+                  className="hidden sm:block"
+               >
                   <Menu />
                </button>
                <Link href={landingPage} className="block w-25 min-w-25">
@@ -127,10 +137,11 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar */}
             <aside
-               inert={!sidebarOpen}
+               inert={!mobile && !desktop}
                className={clsx(
-                  "pointer-events-auto flex w-full grow flex-col items-stretch border-r-amber-500 bg-[#d9d9d9] transition-[translate] sm:w-53 sm:border-r-4",
-                  sidebarOpen ? "translate-x-0" : "-translate-x-full",
+                  "pointer-events-auto flex w-full grow flex-col items-stretch border-r-amber-500 bg-[#d9d9d9] transition-[translate,width] sm:w-53 sm:border-r-4",
+                  mobile ? "translate-x-0" : "-translate-x-full",
+                  desktop ? "sm:translate-x-0" : "sm:-translate-x-full",
                )}
             >
                {items.map((item, i) => {
@@ -139,12 +150,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                      <Link
                         key={item.label + item.link}
                         href={item.link}
+                        inert={isActive}
                         className={clsx(
                            "flex items-center gap-2 px-3 py-3",
                            isActive &&
                               "pointer-events-none bg-gray-500 text-white",
                            i === items.length - 1 && "mt-auto",
                         )}
+                        onClick={() => setMobile(false)}
                      >
                         <span>
                            <item.icon size={20} />
@@ -164,7 +177,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
          <main
             className={clsx(
                "relative pt-14 transition-[padding-left]",
-               sidebarOpen && "sm:pl-53",
+               desktop && "sm:pl-53",
             )}
          >
             {children}
