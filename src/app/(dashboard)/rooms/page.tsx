@@ -1,13 +1,13 @@
 import { roomsPage } from "@/constants";
-import prisma from "@/lib/prisma";
 import { MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import CreateButton from "./_components/CreateButton";
+import getRooms from "@/data-access-layer/rooms";
 
 async function Suspended() {
-   const rooms = await prisma.room.findMany();
+   const rooms = await getRooms();
 
    return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

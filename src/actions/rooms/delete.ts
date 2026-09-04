@@ -1,8 +1,10 @@
 "use server";
 
+import { roomsPage } from "@/constants";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { revalidatePath } from "next/cache";
 
 export default async function deleteRoom(
    id: string,
@@ -21,6 +23,8 @@ export default async function deleteRoom(
    try {
       // Commencing delete
       await prisma.room.delete({ where: { id: roomId } });
+
+      revalidatePath(roomsPage);
 
       return { ok: true, data: { message: "Room deleted successfully" } };
    } catch (e) {

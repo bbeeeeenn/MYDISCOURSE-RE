@@ -1,8 +1,10 @@
 "use server";
 
+import { roomsPage } from "@/constants";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { revalidatePath } from "next/cache";
 
 export default async function editRoom(
    id: string,
@@ -55,6 +57,8 @@ export default async function editRoom(
          where: { id: roomId },
          data: { room_name: name, image_url: imageUrl, capacity, location },
       });
+
+      revalidatePath(roomsPage);
 
       return { ok: true, data: { message: "Room updated successfully" } };
    } catch (e) {
