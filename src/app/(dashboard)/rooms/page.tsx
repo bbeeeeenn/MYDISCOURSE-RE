@@ -1,10 +1,10 @@
-import { createRoomPage, roomsPage } from "@/constants";
-import { auth } from "@/lib/auth";
+import { roomsPage } from "@/constants";
 import prisma from "@/lib/prisma";
-import { MapPin, Plus, UsersRound } from "lucide-react";
+import { MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import CreateButton from "./_components/CreateButton";
 
 async function Suspended() {
    const rooms = await prisma.room.findMany();
@@ -47,25 +47,6 @@ async function Suspended() {
                </div>
             </Link>
          ))}
-      </div>
-   );
-}
-
-async function CreateButton() {
-   const session = await auth();
-   if (session?.user.role !== "ADMIN") return null;
-
-   return (
-      <div className="mt-2 mb-4">
-         <Link
-            href={createRoomPage}
-            className="bg-base-200 text-base-100 flex w-fit items-center justify-center gap-0.5 rounded-md px-8 py-1.5 shadow-md"
-         >
-            <span>
-               <Plus />
-            </span>
-            Create Room
-         </Link>
       </div>
    );
 }
