@@ -58,7 +58,7 @@ model User {
   name          String?
   id_number     String?    @unique
   year_level    Int?
-  password      String? //must be hashed
+  password      String?
   role          Role      @default(STUDENT)
 
   @@index([role])
@@ -72,4 +72,15 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model Room {
+  id String @id @default(cuid())
+  room_name String @unique
+  location String
+  capacity Int
+  image_url String?
+  createdAt DateTime @default(now())
+
+  @@map("rooms")
 }
