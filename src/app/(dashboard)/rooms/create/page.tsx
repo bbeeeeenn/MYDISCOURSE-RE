@@ -8,7 +8,7 @@ export default async function CreateRoomPage() {
    await restrict(["ADMIN"], roomsPage);
 
    return (
-      <div className="p-2">
+      <div className="p-2 pt-5">
          <Back path={roomsPage} />
          <CreateRoomForm />
       </div>

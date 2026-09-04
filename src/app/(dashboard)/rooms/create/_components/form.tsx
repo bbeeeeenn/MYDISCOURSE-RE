@@ -81,7 +81,7 @@ export default function CreateRoomForm() {
          onSubmit={(e) => {
             if (isPending) e.preventDefault();
          }}
-         className="mt-10 px-2"
+         className="mt-5 px-2"
       >
          <h1 className="mb-5 text-2xl font-medium text-gray-600">
             Create Room
