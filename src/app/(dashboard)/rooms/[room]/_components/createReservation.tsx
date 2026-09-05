@@ -141,7 +141,7 @@ function ReservationForm({
                />
             </label>
             <div className="grid grid-cols-2 gap-3">
-               <label className="grid gap-1 text-gray-700" htmlFor="start-time">
+               <label className="text-gray-700" htmlFor="start-time">
                   Start time
                   <input
                      id="start-time"
@@ -150,10 +150,10 @@ function ReservationForm({
                      min="08:00"
                      max="18:00"
                      required
-                     className="min-w-0 rounded-sm border-2 border-gray-500 p-1 text-lg"
+                     className="w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
                   />
                </label>
-               <label className="grid gap-1 text-gray-700" htmlFor="end-time">
+               <label className="text-gray-700" htmlFor="end-time">
                   End time
                   <input
                      id="end-time"
@@ -162,7 +162,7 @@ function ReservationForm({
                      min="08:00"
                      max="18:00"
                      required
-                     className="min-w-0 rounded-sm border-2 border-gray-500 p-1 text-lg"
+                     className="w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
                   />
                </label>
             </div>
