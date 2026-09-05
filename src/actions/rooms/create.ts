@@ -12,7 +12,7 @@ export default async function createRoom(rawData: {
    location: string;
    imageUrl?: string;
    imagePublicId?: string;
-}): ActionResult<{ message: string }> {
+}): ActionResult<{ message: string; roomId: string }> {
    // Checking the session
    const session = await auth();
    if (session?.user.role !== "ADMIN")
@@ -47,7 +47,7 @@ export default async function createRoom(rawData: {
 
    try {
       // Commencing create
-      await prisma.room.create({
+      const newRoom = await prisma.room.create({
          data: {
             room_name: name,
             image_url: imageUrl,
@@ -55,12 +55,16 @@ export default async function createRoom(rawData: {
             capacity,
             location,
          },
+         select: { id: true },
       });
 
       updateTag("rooms");
       revalidatePath(roomsPage);
 
-      return { ok: true, data: { message: "Room created successfully" } };
+      return {
+         ok: true,
+         data: { message: "Room created successfully", roomId: newRoom.id },
+      };
    } catch (e) {
       if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
          return {

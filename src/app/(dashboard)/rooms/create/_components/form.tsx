@@ -70,8 +70,7 @@ export default function CreateRoomForm() {
                image: undefined,
             });
             setImageBlob(undefined);
-            router.replace(roomsPage);
-            router.refresh();
+            router.replace(`${roomsPage}/${res.data.roomId}`);
          }
       } catch (e) {
          if (e instanceof Error) {
