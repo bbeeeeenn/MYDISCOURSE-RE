@@ -9,8 +9,9 @@ import { revalidatePath } from "next/cache";
 export default async function createRoom(rawData: {
    name: string;
    capacity: number;
-   imageUrl?: string;
    location: string;
+   imageUrl?: string;
+   imagePublicId?: string;
 }): ActionResult<{ message: string }> {
    // Checking the session
    const session = await auth();
@@ -21,6 +22,7 @@ export default async function createRoom(rawData: {
    const name = rawData.name.trim();
    const location = rawData.location.trim();
    const imageUrl = rawData.imageUrl?.trim() || undefined;
+   const imagePublicId = rawData.imagePublicId?.trim() || undefined;
    const { capacity } = rawData;
 
    // Validating
@@ -46,10 +48,16 @@ export default async function createRoom(rawData: {
    try {
       // Commencing create
       await prisma.room.create({
-         data: { room_name: name, image_url: imageUrl, capacity, location },
+         data: {
+            room_name: name,
+            image_url: imageUrl,
+            image_public_id: imagePublicId,
+            capacity,
+            location,
+         },
       });
 
-      revalidatePath(roomsPage)
+      revalidatePath(roomsPage);
 
       return { ok: true, data: { message: "Room created successfully" } };
    } catch (e) {

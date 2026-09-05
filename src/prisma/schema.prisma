@@ -61,6 +61,8 @@ model User {
   password      String?
   role          Role      @default(STUDENT)
 
+  reservations Reservation[]
+
   @@index([role])
   @@map("users")
 }
@@ -79,8 +81,30 @@ model Room {
   room_name String @unique
   location String
   capacity Int
-  image_url String?
   createdAt DateTime @default(now())
+  image_url String?
+  image_public_id String?
+
+  reservations Reservation[]
 
   @@map("rooms")
+}
+
+model Reservation {
+  id String @id @default(cuid())
+  roomId String
+  userId String
+  reservationDate DateTime @default(now())
+  startTime DateTime
+  endTime DateTime
+  occupants Int
+  purpose String @db.Text
+  checkedInAt DateTime?
+  checkedOutAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
+
+  @@index([roomId, reservationDate])
+  @@map("reservations")
 }

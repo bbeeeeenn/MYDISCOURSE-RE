@@ -1,6 +1,8 @@
 import "client-only";
 
-export async function uploadToCloudinary(file: File): Promise<string> {
+export async function uploadToCloudinary(
+   file: File,
+): Promise<{ secure_url: string; public_id: string }> {
    const formData = new FormData();
    formData.append("file", file);
    formData.append(
@@ -14,5 +16,5 @@ export async function uploadToCloudinary(file: File): Promise<string> {
    );
    if (!res.ok) throw new Error("Upload failed");
    const data = await res.json();
-   return data.secure_url;
+   return { public_id: data.public_id, secure_url: data.secure_url };
 }

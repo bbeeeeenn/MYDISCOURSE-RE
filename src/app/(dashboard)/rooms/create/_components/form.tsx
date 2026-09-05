@@ -1,13 +1,16 @@
 "use client";
 
 import createRoom from "@/actions/rooms/create";
+import { roomsPage } from "@/constants";
 import { uploadToCloudinary } from "@/lib/cloudinary_helpers";
 import { ImagePlus, LoaderCircle, Plus, X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useActionState, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function CreateRoomForm() {
+   const router = useRouter();
    const [infos, setInfos] = useState<{
       name: string;
       location: string;
@@ -46,14 +49,14 @@ export default function CreateRoomForm() {
 
    const onCreateRoom = async () => {
       try {
-         const imageUrl = infos.image
-            ? await uploadToCloudinary(infos.image)
-            : undefined;
+         const image = infos.image && (await uploadToCloudinary(infos.image));
+
          const res = await createRoom({
             name: infos.name,
             capacity: Number.parseInt(infos.capacity, 10) || 10,
             location: infos.location,
-            imageUrl,
+            imageUrl: image?.secure_url,
+            imagePublicId: image?.public_id,
          });
          toast(res.ok ? res.data.message : res.message, {
             type: res.ok ? "success" : "error",
@@ -67,6 +70,7 @@ export default function CreateRoomForm() {
                image: undefined,
             });
             setImageBlob(undefined);
+            router.replace(roomsPage);
          }
       } catch (e) {
          if (e instanceof Error) {

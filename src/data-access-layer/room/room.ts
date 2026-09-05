@@ -9,6 +9,6 @@ export default async function getRoom(roomId: string) {
    return await prisma.room.findUnique({ where: { id: roomId } });
 }
 
-export function clearRoomCache(roomId: string) {
+export function updateRoomCache(roomId: string) {
    updateTag(`room:${roomId}`);
 }

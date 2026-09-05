@@ -7,6 +7,7 @@ import CreateButton from "./_components/CreateButton";
 import getRooms from "@/data-access-layer/room/rooms";
 
 async function Suspended() {
+   "use cache";
    const rooms = await getRooms();
 
    return (

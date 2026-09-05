@@ -1,7 +1,9 @@
 "use server";
 
 import { roomsPage } from "@/constants";
+import { updateRoomCache } from "@/data-access-layer/room/room";
 import { auth } from "@/lib/auth";
+import deleteImage from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { revalidatePath } from "next/cache";
@@ -12,6 +14,7 @@ export default async function editRoom(
       name: string;
       capacity: number;
       imageUrl?: string;
+      imagePublicId?: string;
       location: string;
    },
 ): ActionResult<{ message: string }> {
@@ -25,6 +28,7 @@ export default async function editRoom(
    const name = rawData.name.trim();
    const location = rawData.location.trim();
    const imageUrl = rawData.imageUrl?.trim() || null;
+   const imagePublicId = rawData.imagePublicId?.trim() || null;
    const { capacity } = rawData;
 
    // Validating
@@ -52,12 +56,29 @@ export default async function editRoom(
    }
 
    try {
+      // Deleting the cloudinary image first (bahala na mo fail sa)
+      const room = await prisma.room.findUnique({ where: { id: roomId } });
+      if (
+         room &&
+         room.image_public_id &&
+         room.image_public_id !== imagePublicId
+      ) {
+         await deleteImage(room.image_public_id);
+      }
+
       // Commencing update
       await prisma.room.update({
          where: { id: roomId },
-         data: { room_name: name, image_url: imageUrl, capacity, location },
+         data: {
+            room_name: name,
+            image_url: imageUrl,
+            image_public_id: imagePublicId,
+            capacity,
+            location,
+         },
       });
 
+      updateRoomCache(roomId);
       revalidatePath(roomsPage);
 
       return { ok: true, data: { message: "Room updated successfully" } };

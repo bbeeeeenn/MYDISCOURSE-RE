@@ -3,7 +3,7 @@ import getRoom from "@/data-access-layer/room/room";
 import { ArrowLeft, MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import EditRoomButton from "./_components/editButton";
+import AdminControls from "./_components/adminControls";
 import Link from "next/link";
 
 export const instant = false;
@@ -29,7 +29,7 @@ export default async function RoomPage({
                   className="absolute inset-0 -z-10 size-full object-cover brightness-50"
                />
             )}
-            <EditRoomButton roomId={room.id} />
+            <AdminControls room={room} />
             <Link
                href={roomsPage}
                className="text-base-100 absolute top-3 left-3 z-100"
