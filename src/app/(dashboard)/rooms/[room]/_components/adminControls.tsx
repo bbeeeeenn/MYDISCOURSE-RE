@@ -276,57 +276,55 @@ function EditForm({
             hidden
             onChange={onImageChoose}
          />
-         <div className="grid gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <label
-               className="grid gap-1.5 text-sm font-semibold text-gray-700"
-               htmlFor="name"
-            >
-               Name
-               <input
-                  type="text"
-                  autoComplete="off"
-                  name="name"
-                  id="name"
-                  value={infos.name}
-                  required
-                  onChange={handleInputChange}
-                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-               />
-            </label>
-            <label
-               className="grid gap-1.5 text-sm font-semibold text-gray-700"
-               htmlFor="location"
-            >
-               Location
-               <input
-                  type="text"
-                  autoComplete="off"
-                  name="location"
-                  required
-                  id="location"
-                  value={infos.location}
-                  onChange={handleInputChange}
-                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-               />
-            </label>
-            <label
-               className="grid gap-1.5 text-sm font-semibold text-gray-700"
-               htmlFor="capacity"
-            >
-               Capacity
-               <input
-                  type="number"
-                  autoComplete="off"
-                  name="capacity"
-                  id="capacity"
-                  min={1}
-                  required
-                  value={infos.capacity}
-                  onChange={handleInputChange}
-                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-               />
-            </label>
-         </div>
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="name"
+         >
+            Name
+            <input
+               type="text"
+               autoComplete="off"
+               name="name"
+               id="name"
+               value={infos.name}
+               required
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
+         </label>
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="location"
+         >
+            Location
+            <input
+               type="text"
+               autoComplete="off"
+               name="location"
+               required
+               id="location"
+               value={infos.location}
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
+         </label>
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="capacity"
+         >
+            Capacity
+            <input
+               type="number"
+               autoComplete="off"
+               name="capacity"
+               id="capacity"
+               min={1}
+               required
+               value={infos.capacity}
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
+         </label>
          <button
             type="submit"
             className={clsx(
