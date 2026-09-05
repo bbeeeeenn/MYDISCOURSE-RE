@@ -11,6 +11,7 @@ import CreateReservation from "./_components/createReservation";
 import getRoomReservations from "@/data-access-layer/room/reservations";
 import { addDays, format, isValid, parseISO } from "date-fns";
 import { formatPhilippineTime, getPhilippineToday } from "@/lib/date";
+import { RoomModel } from "@/generated/prisma/models";
 
 export default async function RoomPage({
    params,
@@ -20,9 +21,35 @@ export default async function RoomPage({
    searchParams: Promise<{ date?: string }>;
 }) {
    return (
-      <Suspense>
+      <Suspense fallback={<RoomPageFallback />}>
          <Suspended params={params} searchParams={searchParams} />
       </Suspense>
+   );
+}
+
+function RoomPageFallback() {
+   return (
+      <div className="animate-pulse" aria-busy="true">
+         <div className="relative min-h-60 bg-gray-200">
+            <div className="absolute inset-x-4 bottom-4 grid gap-2">
+               <div className="h-7 w-48 rounded bg-gray-300" />
+               <div className="h-4 w-32 rounded bg-gray-300" />
+               <div className="h-4 w-20 rounded bg-gray-300" />
+            </div>
+         </div>
+         <div className="flex gap-2 overflow-hidden p-4">
+            {["one", "two", "three", "four", "five"].map((item) => (
+               <div
+                  key={item}
+                  className="h-24 min-w-20 rounded-lg bg-gray-200"
+               />
+            ))}
+         </div>
+         <div className="mt-5 px-3">
+            <div className="h-10 w-48 rounded-md bg-gray-200" />
+         </div>
+         <ReservationsFallback />
+      </div>
    );
 }
 
@@ -37,6 +64,7 @@ async function Suspended({
    const { room: roomId } = await params;
    const room = await getRoom(roomId);
    if (!room) redirect(roomsPage);
+
    const today = parseISO(getPhilippineToday());
    const fallbackDate = today.getDay() === 0 ? addDays(today, 1) : today;
    const requestedDate = date ? parseISO(date) : fallbackDate;
@@ -45,7 +73,6 @@ async function Suspended({
          ? requestedDate
          : fallbackDate;
    const selectedDate = format(normalizedDate, "yyyy-MM-dd");
-   const reservations = await getRoomReservations(room.id, selectedDate);
 
    return (
       <>
@@ -86,48 +113,86 @@ async function Suspended({
             <CreateReservation room={room} dateParam={selectedDate} />
          </div>
 
-         <section className="p-3 pb-25">
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-               <h2 className="text-lg font-semibold">Reservations</h2>
-               <p className="text-sm text-gray-500">
-                  {format(parseISO(selectedDate), "EEE, MMM d")}
-               </p>
-            </div>
-            {reservations.length === 0 ? (
-               <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
-                  No reservations for this day.
-               </p>
-            ) : (
-               <div className="grid gap-3">
-                  {reservations.map((reservation) => (
-                     <article
-                        key={reservation.id}
-                        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
-                     >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                           <p className="font-semibold">
-                              {formatPhilippineTime(reservation.startTime)} -{" "}
-                              {formatPhilippineTime(reservation.endTime)}
-                           </p>
-                           <p className="text-sm text-gray-600">
-                              {reservation.occupants}{" "}
-                              {reservation.occupants === 1
-                                 ? "person"
-                                 : "people"}
-                           </p>
-                        </div>
-                        <p className="mt-2 text-sm text-gray-600">
-                           Reserved by{" "}
-                           {reservation.user.name?.trim() || "Unnamed user"}
-                        </p>
-                        <p className="mt-2 text-gray-800">
-                           {reservation.purpose}
-                        </p>
-                     </article>
-                  ))}
-               </div>
-            )}
-         </section>
+         <Suspense fallback={<ReservationsFallback />}>
+            <Reservations room={room} selectedDate={selectedDate} />
+         </Suspense>
       </>
+   );
+}
+
+function ReservationsFallback() {
+   return (
+      <section className="animate-pulse p-3 pb-25" aria-busy="true">
+         <div className="mb-3 flex items-baseline justify-between gap-3">
+            <div className="h-6 w-32 rounded bg-gray-200" />
+            <div className="h-4 w-24 rounded bg-gray-200" />
+         </div>
+         <div className="grid gap-3">
+            {["first", "second"].map((item) => (
+               <div
+                  key={item}
+                  className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+               >
+                  <div className="flex items-center justify-between gap-3">
+                     <div className="h-5 w-36 rounded bg-gray-200" />
+                     <div className="h-4 w-16 rounded bg-gray-200" />
+                  </div>
+                  <div className="mt-3 h-4 w-40 rounded bg-gray-200" />
+                  <div className="mt-3 h-4 w-3/4 rounded bg-gray-200" />
+               </div>
+            ))}
+         </div>
+      </section>
+   );
+}
+
+async function Reservations({
+   selectedDate,
+   room,
+}: {
+   selectedDate: string;
+   room: RoomModel;
+}) {
+   const reservations = await getRoomReservations(room.id, selectedDate);
+
+   return (
+      <section className="p-3 pb-25">
+         <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 className="text-lg font-semibold">Reservations</h2>
+            <p className="text-sm text-gray-500">
+               {format(parseISO(selectedDate), "EEE, MMM d")}
+            </p>
+         </div>
+         {reservations.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
+               No reservations for this day.
+            </p>
+         ) : (
+            <div className="grid gap-3">
+               {reservations.map((reservation) => (
+                  <article
+                     key={reservation.id}
+                     className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                  >
+                     <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="font-semibold">
+                           {formatPhilippineTime(reservation.startTime)} -{" "}
+                           {formatPhilippineTime(reservation.endTime)}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                           {reservation.occupants}{" "}
+                           {reservation.occupants === 1 ? "person" : "people"}
+                        </p>
+                     </div>
+                     <p className="mt-2 text-sm text-gray-600">
+                        Reserved by{" "}
+                        {reservation.user.name?.trim() || "Unnamed user"}
+                     </p>
+                     <p className="mt-2 text-gray-800">{reservation.purpose}</p>
+                  </article>
+               ))}
+            </div>
+         )}
+      </section>
    );
 }
