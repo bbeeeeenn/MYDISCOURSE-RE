@@ -4,13 +4,12 @@ import editRoom from "@/actions/rooms/edit";
 import { RoomModel } from "@/generated/prisma/models";
 import { uploadToCloudinary } from "@/lib/cloudinary_helpers";
 import clsx from "clsx";
-import { ImagePlus, LoaderCircle, Pen, Trash2, X } from "lucide-react";
+import { ImagePlus, LoaderCircle, Pen, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import {
    ChangeEvent,
    Fragment,
-   ReactNode,
    useActionState,
    useEffect,
    useRef,
@@ -20,6 +19,7 @@ import { toast } from "react-toastify";
 import deleteRoom from "@/actions/rooms/delete";
 import { roomsPage } from "@/constants";
 import { usePathname } from "next/navigation";
+import { Dialog, toggleDialog } from "@/components/ui/Dialog";
 
 export default function AdminControls({ room }: { room: RoomModel }) {
    const pathname = usePathname(); // used for key
@@ -59,51 +59,6 @@ export default function AdminControls({ room }: { room: RoomModel }) {
             </Dialog>
          </Fragment>
       )
-   );
-}
-
-function toggleDialog(
-   dialogRef: { current: HTMLDialogElement | null },
-   state?: boolean,
-) {
-   const dialog = dialogRef.current;
-   if (!dialog) return;
-
-   if (state === undefined) {
-      state = !dialog.open;
-   }
-
-   if (state) dialog.showModal();
-   else dialog.close();
-}
-
-function Dialog({
-   dialogRef,
-   title,
-   onClose,
-   children,
-}: {
-   dialogRef: { current: HTMLDialogElement | null };
-   title: string;
-   onClose: () => void;
-   children: ReactNode;
-}) {
-   return (
-      <dialog
-         ref={dialogRef}
-         onClick={(e) => {
-            if (e.target === e.currentTarget) onClose();
-         }}
-         className="m-auto w-[calc(100%-16px)] max-w-150 rounded-md bg-gray-50 shadow-lg outline-none select-none"
-      >
-         <div className="flex justify-between border-b-4 border-b-amber-500 bg-[#d9d9d9] p-3 font-bold text-black/75">
-            {title}
-            <button onClick={onClose}>
-               <X />
-            </button>
-         </div>
-         {children}
-      </dialog>
    );
 }
 
@@ -250,103 +205,132 @@ function EditForm({
          onSubmit={(e) => {
             if (isPending) e.preventDefault();
          }}
-         className="px-4 py-6"
+         className="max-h-[min(70vh,42rem)] space-y-5 overflow-y-auto px-4 py-6"
       >
-         <label
-            htmlFor="image"
-            className={clsx(
-               "relative z-0 mx-auto flex aspect-square h-30 cursor-pointer items-center justify-center border-dashed border-gray-500 bg-gray-300",
-               !infos.image && !newImage.blob && "border-2",
-            )}
-         >
-            {!infos.image && !newImage.blob && (
-               <ImagePlus className="absolute -z-10 text-gray-500" />
-            )}
-            {infos.image ? (
-               <Image
-                  src={infos.image}
-                  alt=""
-                  width={200}
-                  height={200}
-                  className="size-full rounded-md object-cover"
-               />
-            ) : (
-               newImage.blob && (
-                  <Image
-                     src={newImage.blob}
-                     alt=""
-                     width={200}
-                     height={200}
-                     onLoad={() => setImageLoading(false)}
-                     onError={() => setImageLoading(false)}
-                     className="size-full rounded-md object-cover"
-                  />
-               )
-            )}
-            {imageLoading && (
-               <LoaderCircle className="text-base-100 absolute animate-spin" />
-            )}
-            {(infos.image || newImage.blob) && (
-               <button
-                  type="button"
-                  className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 rounded-full bg-gray-200 p-1 shadow-md"
-                  onClick={handleImageRemove}
+         <div>
+            <p className="mb-2 text-sm font-semibold tracking-wide text-gray-700">
+               Room image
+            </p>
+            <div className="relative mx-auto w-full max-w-52">
+               <label
+                  htmlFor="image"
+                  className={clsx(
+                     "relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-400 bg-gray-100 transition-colors hover:border-amber-500 hover:bg-amber-50",
+                     (infos.image || newImage.blob) &&
+                        "border-solid border-gray-300",
+                  )}
                >
-                  <Trash2 size={15} />
-               </button>
-            )}
-         </label>
+                  {!infos.image && !newImage.blob && (
+                     <span className="flex flex-col items-center gap-2 text-gray-500">
+                        <ImagePlus size={28} />
+                        <span className="text-sm font-medium">
+                           Choose image
+                        </span>
+                     </span>
+                  )}
+                  {infos.image ? (
+                     <Image
+                        src={infos.image}
+                        alt=""
+                        fill
+                        sizes="208px"
+                        className="object-cover"
+                     />
+                  ) : (
+                     newImage.blob && (
+                        <Image
+                           src={newImage.blob}
+                           alt=""
+                           fill
+                           sizes="208px"
+                           onLoad={() => setImageLoading(false)}
+                           onError={() => setImageLoading(false)}
+                           className="object-cover"
+                        />
+                     )
+                  )}
+                  {imageLoading && (
+                     <span className="text-base-100 absolute inset-0 flex items-center justify-center bg-black/25">
+                        <LoaderCircle className="animate-spin" />
+                     </span>
+                  )}
+               </label>
+               {(infos.image || newImage.blob) && (
+                  <button
+                     type="button"
+                     aria-label="Remove image"
+                     title="Remove image"
+                     className="absolute top-2 right-2 rounded-full bg-white p-2 text-gray-700 shadow-md transition-colors hover:bg-red-50 hover:text-red-700"
+                     onClick={handleImageRemove}
+                  >
+                     <Trash2 size={16} />
+                  </button>
+               )}
+            </div>
+         </div>
          <input
             type="file"
             name="image"
             id="image"
+            accept="image/*"
             hidden
             onChange={onImageChoose}
          />
-         <label htmlFor="name" className="mt-2 block w-fit text-gray-700">
-            Name
-         </label>
-         <input
-            type="text"
-            autoComplete="off"
-            name="name"
-            id="name"
-            value={infos.name}
-            required
-            onChange={handleInputChange}
-            className="block w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
-         <label htmlFor="location" className="mt-2 block w-fit text-gray-700">
-            Location
-         </label>
-         <input
-            type="text"
-            autoComplete="off"
-            name="location"
-            required
-            id="location"
-            value={infos.location}
-            onChange={handleInputChange}
-            className="block w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
-         <label htmlFor="location" className="mt-2 block w-fit text-gray-700">
-            Capacity
-         </label>
-         <input
-            type="number"
-            autoComplete="off"
-            name="capacity"
-            id="capacity"
-            min={1}
-            required
-            value={infos.capacity}
-            onChange={handleInputChange}
-            className="block w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
+         <div className="grid gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <label
+               className="grid gap-1.5 text-sm font-semibold text-gray-700"
+               htmlFor="name"
+            >
+               Name
+               <input
+                  type="text"
+                  autoComplete="off"
+                  name="name"
+                  id="name"
+                  value={infos.name}
+                  required
+                  onChange={handleInputChange}
+                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+               />
+            </label>
+            <label
+               className="grid gap-1.5 text-sm font-semibold text-gray-700"
+               htmlFor="location"
+            >
+               Location
+               <input
+                  type="text"
+                  autoComplete="off"
+                  name="location"
+                  required
+                  id="location"
+                  value={infos.location}
+                  onChange={handleInputChange}
+                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+               />
+            </label>
+            <label
+               className="grid gap-1.5 text-sm font-semibold text-gray-700"
+               htmlFor="capacity"
+            >
+               Capacity
+               <input
+                  type="number"
+                  autoComplete="off"
+                  name="capacity"
+                  id="capacity"
+                  min={1}
+                  required
+                  value={infos.capacity}
+                  onChange={handleInputChange}
+                  className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+               />
+            </label>
+         </div>
          <button
             type="submit"
             className={clsx(
-               "bg-base-200 text-base-100 mt-4 flex w-full items-center justify-center gap-1 rounded-md py-2 text-lg font-medium",
+               "bg-base-200 text-base-100 flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-base font-semibold shadow-sm transition hover:brightness-110",
                isPending && "opacity-75",
             )}
             disabled={isPending}

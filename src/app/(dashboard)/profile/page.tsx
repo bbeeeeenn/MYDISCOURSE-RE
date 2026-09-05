@@ -1,17 +1,39 @@
-"use client";
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import ProfileForm from "./_components/ProfileForm";
+import SignOutButton from "./_components/SignOutButton";
+import { Suspense } from "react";
 
-import { signOut } from "next-auth/react";
+async function Suspended() {
+   const session = await auth();
+   if (!session?.user.id) redirect("/signin");
 
-export default function AccountPage() {
-  return (
-    <div className="relative min-h-[calc(100dvh-56px)] pb-11">
-      <button
-        type="button"
-        onClick={() => signOut({ callbackUrl: "/signin" })}
-        className="text-base-100 absolute inset-x-0 bottom-0 bg-red-600 py-2 text-xl font-medium"
-      >
-        Sign out
-      </button>
-    </div>
-  );
+   const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+         name: true,
+         email: true,
+         id_number: true,
+         year_level: true,
+         course: true,
+         role: true,
+      },
+   });
+   if (!user) redirect("/signin");
+   return (
+      <div className="relative min-h-[calc(100dvh-56px)] pb-11">
+         <ProfileForm user={user} />
+
+         <SignOutButton />
+      </div>
+   );
+}
+
+export default async function AccountPage() {
+   return (
+      <Suspense>
+         <Suspended />
+      </Suspense>
+   );
 }

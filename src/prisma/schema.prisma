@@ -58,6 +58,7 @@ model User {
   name          String?
   id_number     String?    @unique
   year_level    Int?
+  course        String?
   password      String?
   role          Role      @default(STUDENT)
 

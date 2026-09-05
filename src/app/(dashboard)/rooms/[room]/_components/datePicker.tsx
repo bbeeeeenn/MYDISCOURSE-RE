@@ -1,17 +1,10 @@
 "use client";
 
 import clsx from "clsx";
-import {
-   addDays,
-   format,
-   getDate,
-   getDay,
-   parseISO,
-   startOfDay,
-} from "date-fns";
+import { addDays, format, parseISO, startOfDay } from "date-fns";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const months = [
@@ -80,17 +73,27 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
 
 function DateCard({ date, active }: { date: Date; active: boolean }) {
    const pathname = usePathname();
+   const formatted = format(date, "yyyy-MM-dd");
    return (
       <Link
-         href={`${pathname}?date=${format(date, "yyyy-MM-dd")}`}
+         href={`${pathname}?date=${formatted}`}
+         tabIndex={-1}
          className={clsx(
             "flex min-w-20 flex-col items-center rounded-lg p-2 text-sm font-medium",
-            active ? "bg-yellow-500" : "bg-gray-200",
+            active
+               ? "bg-base-200 text-base-100 pointer-events-none"
+               : "bg-gray-200",
          )}
       >
-         <p>{daysOfWeek[date.getDay()]}</p>
-         <p className="text-2xl">{date.getDate()}</p>
-         <p>{months[date.getMonth()]}</p>
+         {formatted === format(startOfDay(new Date()), "yyyy-MM-dd") ? (
+            <p className="m-auto text-lg font-bold">Today</p>
+         ) : (
+            <>
+               <p>{daysOfWeek[date.getDay()]}</p>
+               <p className="text-2xl">{date.getDate()}</p>
+               <p>{months[date.getMonth()]}</p>
+            </>
+         )}
       </Link>
    );
 }

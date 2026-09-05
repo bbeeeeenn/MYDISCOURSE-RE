@@ -12,4 +12,6 @@ export default async function restrict(
    if (!allowedRoles.includes(session.user.role)) {
       redirect(redirectTo);
    }
+
+   return session.user;
 }

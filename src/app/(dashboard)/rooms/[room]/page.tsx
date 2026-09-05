@@ -7,6 +7,7 @@ import AdminControls from "./_components/adminControls";
 import Link from "next/link";
 import { Suspense } from "react";
 import DatePicker from "./_components/datePicker";
+import CreateReservation from "./_components/createReservation";
 
 export default async function RoomPage({
    params,
@@ -69,6 +70,9 @@ async function Suspended({
          </div>
 
          <DatePicker dateParam={date} />
+         <div className="mt-5 p-3">
+            <CreateReservation room={room} dateParam={date} />
+         </div>
       </>
    );
 }
