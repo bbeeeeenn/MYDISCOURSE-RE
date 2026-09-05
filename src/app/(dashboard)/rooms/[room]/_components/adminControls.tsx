@@ -6,7 +6,6 @@ import { uploadToCloudinary } from "@/lib/cloudinary_helpers";
 import clsx from "clsx";
 import { ImagePlus, LoaderCircle, Pen, Trash2, X } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
    ChangeEvent,
@@ -106,18 +105,18 @@ function Dialog({
 }
 
 function DeleteForm({ room }: { room: RoomModel }) {
-   const router = useRouter();
    const [typedName, setTypedName] = useState("");
    const valid = typedName === room.room_name;
 
    const onDelete = async () => {
+      if (!valid) return;
       const res = await deleteRoom(room.id);
       toast(res.ok ? res.data.message : res.message, {
          type: res.ok ? "success" : "error",
          position: "bottom-right",
       });
       if (res.ok) {
-         router.replace(roomsPage);
+         window.location.assign(roomsPage);
       }
    };
    const [, deleteAction, isPending] = useActionState(onDelete, undefined);
@@ -145,9 +144,9 @@ function DeleteForm({ room }: { room: RoomModel }) {
          <button
             className={clsx(
                "text-base-100 mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-red-700 py-2 font-bold",
-               (isPending || !valid) && "opacity-30",
+               (isPending || !valid) && "pointer-events-none opacity-30",
             )}
-            disabled={isPending}
+            disabled={isPending || !valid}
          >
             <span>
                {isPending ? (
@@ -169,7 +168,6 @@ function EditForm({
    room: RoomModel;
    toggleDialog: (state?: boolean) => void;
 }) {
-   const router = useRouter();
    const [infos, setInfos] = useState<{
       name: string;
       location: string;
@@ -232,7 +230,6 @@ function EditForm({
          });
          if (res.ok) {
             toggleDialog(false);
-            router.refresh();
          }
       } catch (e) {
          if (e instanceof Error) {
