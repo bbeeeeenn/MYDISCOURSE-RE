@@ -4,10 +4,11 @@ import { Dialog, toggleDialog } from "@/components/ui/Dialog";
 import { RoomModel } from "@/generated/prisma/models";
 import createReservation from "@/actions/reservations/create";
 import { profilePage } from "@/constants";
+import { getPhilippineToday } from "@/lib/date";
 import clsx from "clsx";
 import { LoaderCircle, Plus } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useActionState, useRef } from "react";
+import { SubmitEvent, useActionState, useRef } from "react";
 import { toast } from "react-toastify";
 
 export default function CreateReservation({
@@ -58,7 +59,7 @@ function ReservationForm({
    dateParam?: string;
    closeDialog: () => void;
 }) {
-   const today = new Date().toISOString().slice(0, 10);
+   const today = getPhilippineToday();
    const selectedDate = dateParam && dateParam >= today ? dateParam : today;
    const router = useRouter();
    const [state, formAction, isPending] = useActionState(
@@ -68,7 +69,10 @@ function ReservationForm({
             type: result.ok ? "success" : "error",
             position: "bottom-right",
          });
-         if (result.ok) closeDialog();
+         if (result.ok) {
+            closeDialog();
+            router.refresh();
+         }
          if (
             !result.ok &&
             result.message ===
@@ -81,8 +85,36 @@ function ReservationForm({
       undefined,
    );
 
-   const preventWhilePending = (event: FormEvent<HTMLFormElement>) => {
-      if (isPending) event.preventDefault();
+   const preventWhilePending = (event: SubmitEvent<HTMLFormElement>) => {
+      const date = event.currentTarget.elements.namedItem(
+         "scheduledDate",
+      ) as HTMLInputElement;
+      const startTime = event.currentTarget.elements.namedItem(
+         "startTime",
+      ) as HTMLInputElement;
+      const endTime = event.currentTarget.elements.namedItem(
+         "endTime",
+      ) as HTMLInputElement;
+      const selectedDate = date.value
+         ? new Date(`${date.value}T00:00:00`)
+         : null;
+      const isWeekday = selectedDate !== null && selectedDate.getDay() !== 0;
+      const validHours =
+         startTime.value >= "08:00" &&
+         endTime.value <= "18:00" &&
+         startTime.value < endTime.value;
+
+      date.setCustomValidity(
+         isWeekday ? "" : "Reservations are available Monday through Saturday",
+      );
+      startTime.setCustomValidity(
+         validHours ? "" : "Choose a time between 8:00 AM and 6:00 PM",
+      );
+      endTime.setCustomValidity(
+         validHours ? "" : "Choose a time between 8:00 AM and 6:00 PM",
+      );
+
+      if (isPending || !isWeekday || !validHours) event.preventDefault();
    };
 
    return (
@@ -111,6 +143,8 @@ function ReservationForm({
                   id="start-time"
                   name="startTime"
                   type="time"
+                  min="08:00"
+                  max="18:00"
                   required
                   className="rounded-sm border-2 border-gray-500 p-1 text-lg"
                />
@@ -121,6 +155,8 @@ function ReservationForm({
                   id="end-time"
                   name="endTime"
                   type="time"
+                  min="08:00"
+                  max="18:00"
                   required
                   className="rounded-sm border-2 border-gray-500 p-1 text-lg"
                />

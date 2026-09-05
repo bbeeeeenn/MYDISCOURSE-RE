@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { parsePhilippineDateTime } from "@/lib/date";
 import prisma from "@/lib/prisma";
 
 export default async function createReservation(
@@ -42,6 +43,21 @@ export default async function createReservation(
          message: "Date and times are required",
       };
    }
+   const scheduledDay = parsePhilippineDateTime(scheduledDate, "12:00");
+   if (Number.isNaN(scheduledDay.getTime()) || scheduledDay.getUTCDay() === 0) {
+      return {
+         ok: false,
+         error: "VALIDATION",
+         message: "Reservations are available Monday through Saturday",
+      };
+   }
+   if (startTime < "08:00" || endTime > "18:00") {
+      return {
+         ok: false,
+         error: "VALIDATION",
+         message: "Reservations are available from 8:00 AM to 6:00 PM",
+      };
+   }
    if (startTime >= endTime) {
       return {
          ok: false,
@@ -68,8 +84,8 @@ export default async function createReservation(
       };
    }
 
-   const start = new Date(`${scheduledDate}T${startTime}:00`);
-   const end = new Date(`${scheduledDate}T${endTime}:00`);
+   const start = parsePhilippineDateTime(scheduledDate, startTime);
+   const end = parsePhilippineDateTime(scheduledDate, endTime);
    const overlap = await prisma.reservation.findFirst({
       where: {
          roomId,
@@ -81,19 +97,32 @@ export default async function createReservation(
       return {
          ok: false,
          error: "CONFLICT",
-         message: "That time is already reserved",
+         message: "There is an overlap with an existing reservation",
       };
    }
 
-   await prisma.reservation.create({
-      data: {
-         roomId,
-         userId,
-         startTime: start,
-         endTime: end,
-         occupants,
-         purpose,
-      },
-   });
-   return { ok: true, data: { message: "Reservation created successfully" } };
+   try {
+      await prisma.reservation.create({
+         data: {
+            roomId,
+            userId,
+            startTime: start,
+            endTime: end,
+            occupants,
+            purpose,
+         },
+      });
+
+      return {
+         ok: true,
+         data: { message: "Reservation created successfully" },
+      };
+   } catch (error) {
+      console.error(error);
+      return {
+         ok: false,
+         error: "DATABASE",
+         message: "Unable to create reservation",
+      };
+   }
 }

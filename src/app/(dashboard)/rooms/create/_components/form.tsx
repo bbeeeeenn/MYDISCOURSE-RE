@@ -85,40 +85,54 @@ export default function CreateRoomForm() {
          onSubmit={(e) => {
             if (isPending) e.preventDefault();
          }}
-         className="mt-5 px-2"
+         className="mt-5 grid max-w-2xl gap-5 px-2 pb-8"
       >
-         <h1 className="mb-5 text-2xl font-medium text-gray-600">
-            Create Room
-         </h1>
-         {imageBlob ? (
-            <label
-               htmlFor="image"
-               className="relative block w-fit cursor-pointer"
-            >
-               <Image
-                  src={imageBlob}
-                  alt="image"
-                  width={500}
-                  height={500}
-                  unoptimized
-                  className="aspect-square w-40 rounded-md object-cover"
-               />
-               <button
-                  type="button"
-                  className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-200 p-1"
-                  onClick={handleImageRemove}
+         <div>
+            <h1 className="text-2xl font-bold text-gray-800">Create room</h1>
+            <p className="mt-1 text-sm text-gray-500">
+               Add the room details and an optional photo.
+            </p>
+         </div>
+         <div>
+            <p className="mb-2 text-sm font-semibold tracking-wide text-gray-700">
+               Room image
+            </p>
+            <div className="relative w-full max-w-52">
+               <label
+                  htmlFor="image"
+                  className="relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-400 bg-gray-100 transition-colors hover:border-amber-500 hover:bg-amber-50"
                >
-                  <X size={15} />
-               </button>
-            </label>
-         ) : (
-            <label
-               htmlFor="image"
-               className="flex aspect-square w-20 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-500 bg-gray-300 text-gray-500"
-            >
-               <ImagePlus />
-            </label>
-         )}
+                  {imageBlob ? (
+                     <Image
+                        src={imageBlob}
+                        alt="Selected room"
+                        fill
+                        sizes="208px"
+                        unoptimized
+                        className="object-cover"
+                     />
+                  ) : (
+                     <span className="flex flex-col items-center gap-2 text-gray-500">
+                        <ImagePlus size={28} />
+                        <span className="text-sm font-medium">
+                           Choose image
+                        </span>
+                     </span>
+                  )}
+               </label>
+               {imageBlob && (
+                  <button
+                     type="button"
+                     aria-label="Remove image"
+                     title="Remove image"
+                     className="absolute top-2 right-2 rounded-full bg-white p-2 text-gray-700 shadow-md transition-colors hover:bg-red-50 hover:text-red-700"
+                     onClick={handleImageRemove}
+                  >
+                     <X size={16} />
+                  </button>
+               )}
+            </div>
+         </div>
          <input
             type="file"
             name="image"
@@ -127,47 +141,60 @@ export default function CreateRoomForm() {
             className="hidden"
             onChange={handleImageChoose}
          />
-         <label htmlFor="name" className="mt-2 block w-fit text-gray-700">
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="name"
+         >
             Name
+            <input
+               type="text"
+               autoComplete="off"
+               name="name"
+               id="name"
+               value={infos.name}
+               required
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
          </label>
-         <input
-            type="text"
-            autoComplete="off"
-            name="name"
-            id="name"
-            value={infos.name}
-            required
-            onChange={handleInputChange}
-            className="block w-full max-w-100 rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
-         <label htmlFor="location" className="mt-2 block w-fit text-gray-700">
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="location"
+         >
             Location
+            <input
+               type="text"
+               autoComplete="off"
+               name="location"
+               id="location"
+               value={infos.location}
+               required
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
          </label>
-         <input
-            type="text"
-            autoComplete="off"
-            name="location"
-            required
-            id="location"
-            value={infos.location}
-            onChange={handleInputChange}
-            className="block w-full max-w-100 rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
-         <label htmlFor="location" className="mt-2 block w-fit text-gray-700">
+         <label
+            className="grid gap-1.5 text-sm font-semibold text-gray-700"
+            htmlFor="capacity"
+         >
             Capacity
+            <input
+               type="number"
+               autoComplete="off"
+               name="capacity"
+               id="capacity"
+               min={1}
+               required
+               value={infos.capacity}
+               onChange={handleInputChange}
+               className="rounded-md border border-gray-300 bg-white p-2.5 text-base font-normal transition outline-none"
+            />
          </label>
-         <input
-            type="number"
-            autoComplete="off"
-            name="capacity"
-            id="capacity"
-            min={1}
-            required
-            value={infos.capacity}
-            onChange={handleInputChange}
-            className="block w-full max-w-100 rounded-sm border-2 border-gray-500 p-1 text-lg"
-         />
-         <button className="bg-base-200 text-base-100 mt-4 flex w-full max-w-100 items-center justify-center gap-1 rounded-md py-2 text-lg font-medium">
+         <button
+            type="submit"
+            disabled={isPending}
+            className="bg-base-200 text-base-100 flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-base font-semibold shadow-sm transition hover:brightness-110 disabled:opacity-75"
+         >
             {isPending ? (
                <>
                   <span>

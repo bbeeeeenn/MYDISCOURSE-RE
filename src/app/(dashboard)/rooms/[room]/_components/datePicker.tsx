@@ -1,10 +1,11 @@
 "use client";
 
 import clsx from "clsx";
-import { addDays, format, parseISO, startOfDay } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { getPhilippineToday } from "@/lib/date";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const months = [
@@ -27,9 +28,12 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
    const sentinel = useRef<HTMLDivElement>(null);
    const selectedDate = dateParam
       ? parseISO(dateParam)
-      : startOfDay(new Date());
+      : parseISO(getPhilippineToday());
 
-   const [dates, setDates] = useState([startOfDay(new Date())]);
+   const dateNow = parseISO(getPhilippineToday());
+   const [dates, setDates] = useState([
+      dateNow.getDay() === 0 ? addDays(dateNow, 1) : dateNow,
+   ]);
 
    useEffect(() => {
       const observer = new IntersectionObserver(
@@ -38,8 +42,12 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
                setDates((prev) => {
                   const currDate = prev[prev.length - 1];
                   const newDates = [];
+
+                  // Populate newDates
                   for (let i = 1; i <= 30; i++) {
-                     newDates.push(addDays(currDate, i));
+                     const newDate = addDays(currDate, i);
+                     if (newDate.getDay() === 0) continue;
+                     newDates.push(newDate);
                   }
                   return [...prev, ...newDates];
                });
@@ -74,6 +82,7 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
 function DateCard({ date, active }: { date: Date; active: boolean }) {
    const pathname = usePathname();
    const formatted = format(date, "yyyy-MM-dd");
+   const isToday = formatted === getPhilippineToday();
    return (
       <Link
          href={`${pathname}?date=${formatted}`}
@@ -85,15 +94,15 @@ function DateCard({ date, active }: { date: Date; active: boolean }) {
                : "bg-gray-200",
          )}
       >
-         {formatted === format(startOfDay(new Date()), "yyyy-MM-dd") ? (
-            <p className="m-auto text-lg font-bold">Today</p>
-         ) : (
-            <>
-               <p>{daysOfWeek[date.getDay()]}</p>
-               <p className="text-2xl">{date.getDate()}</p>
-               <p>{months[date.getMonth()]}</p>
-            </>
-         )}
+         <span className="text-xs font-semibold tracking-wide uppercase opacity-70">
+            {isToday ? "Today" : daysOfWeek[date.getDay()]}
+         </span>
+         <span className="text-2xl leading-tight font-bold">
+            {date.getDate()}
+         </span>
+         <span className="text-xs font-medium opacity-70">
+            {months[date.getMonth()]}
+         </span>
       </Link>
    );
 }
