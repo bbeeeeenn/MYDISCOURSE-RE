@@ -21,19 +21,18 @@ async function Suspended() {
       },
    });
    if (!user) redirect("/signin");
-   return (
-      <div className="relative min-h-[calc(100dvh-56px)] pb-11">
-         <ProfileForm user={user} />
-
-         <SignOutButton />
-      </div>
-   );
+   return <ProfileForm user={user} />;
 }
 
-export default async function AccountPage() {
+export default function AccountPage() {
    return (
-      <Suspense>
-         <Suspended />
-      </Suspense>
+      <>
+         <div className="relative min-h-[calc(100dvh-56px)] pb-11">
+            <Suspense>
+               <Suspended />
+            </Suspense>
+            <SignOutButton />
+         </div>
+      </>
    );
 }
