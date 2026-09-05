@@ -4,7 +4,7 @@ import { roomsPage } from "@/constants";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 export default async function createRoom(rawData: {
    name: string;
@@ -57,6 +57,7 @@ export default async function createRoom(rawData: {
          },
       });
 
+      updateTag("rooms");
       revalidatePath(roomsPage);
 
       return { ok: true, data: { message: "Room created successfully" } };

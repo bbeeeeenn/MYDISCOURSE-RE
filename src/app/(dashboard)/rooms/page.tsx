@@ -3,11 +3,13 @@ import { MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { cacheTag } from "next/cache";
 import CreateButton from "./_components/CreateButton";
 import getRooms from "@/data-access-layer/room/rooms";
 
 async function Suspended() {
    "use cache";
+   cacheTag("rooms");
    const rooms = await getRooms();
 
    return (
