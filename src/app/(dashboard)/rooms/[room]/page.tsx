@@ -6,26 +6,37 @@ import { redirect } from "next/navigation";
 import AdminControls from "./_components/adminControls";
 import Link from "next/link";
 import { Suspense } from "react";
+import DatePicker from "./_components/datePicker";
 
 export default async function RoomPage({
    params,
+   searchParams,
 }: {
    params: Promise<{ room: string }>;
+   searchParams: Promise<{ date?: string }>;
 }) {
    return (
       <Suspense>
-         <Suspended params={params} />
+         <Suspended params={params} searchParams={searchParams} />
       </Suspense>
    );
 }
 
-async function Suspended({ params }: { params: Promise<{ room: string }> }) {
+async function Suspended({
+   params,
+   searchParams,
+}: {
+   params: Promise<{ room: string }>;
+   searchParams: Promise<{ date?: string }>;
+}) {
+   const { date } = await searchParams;
    const { room: roomId } = await params;
    const room = await getRoom(roomId);
    if (!room) redirect(roomsPage);
 
    return (
       <>
+         {/* Header */}
          <div className="relative z-0 min-h-60 bg-gray-800 shadow-md">
             {room.image_url && (
                <Image
@@ -56,6 +67,8 @@ async function Suspended({ params }: { params: Promise<{ room: string }> }) {
                </p>
             </div>
          </div>
+
+         <DatePicker dateParam={date} />
       </>
    );
 }

@@ -13,4 +13,4 @@ export const scanPage = "/scan";
 export const reportsPage = "/reports";
 export const reservationsPage = "/reservations";
 export const usersPage = "/users";
-export const accountPage = "/account";
+export const profilePage = "/profile";

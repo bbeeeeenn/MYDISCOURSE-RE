@@ -11,7 +11,7 @@ import {
    reportsPage,
    reservationsPage,
    usersPage,
-   accountPage,
+   profilePage,
    signInPage,
    landingPage,
 } from "@/constants";
@@ -51,7 +51,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Scroll, label: "History", link: historyPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
-      { icon: CircleUserRound, label: "Account", link: accountPage },
+      { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
    STAFF: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
@@ -61,7 +61,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: Scroll, label: "Logs", link: logsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
-      { icon: CircleUserRound, label: "Account", link: accountPage },
+      { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
    ADMIN: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
@@ -72,7 +72,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: StickyNote, label: "Reports", link: reportsPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
       { icon: Users, label: "Users", link: usersPage },
-      { icon: CircleUserRound, label: "Account", link: accountPage },
+      { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
 };
 
@@ -155,7 +155,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                            "flex items-center gap-2 px-3 py-3",
                            isActive &&
                               "pointer-events-none bg-gray-500 text-white",
-                           i === items.length - 1 && "mt-auto",
+                           i === items.length - 1 &&
+                              item.link === profilePage &&
+                              "mt-auto",
                         )}
                         onClick={() => setMobile(false)}
                      >
