@@ -5,13 +5,21 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import AdminControls from "./_components/adminControls";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export const instant = false;
 export default async function RoomPage({
    params,
 }: {
    params: Promise<{ room: string }>;
 }) {
+   return (
+      <Suspense>
+         <Suspended params={params} />
+      </Suspense>
+   );
+}
+
+async function Suspended({ params }: { params: Promise<{ room: string }> }) {
    const { room: roomId } = await params;
    const room = await getRoom(roomId);
    if (!room) redirect(roomsPage);
