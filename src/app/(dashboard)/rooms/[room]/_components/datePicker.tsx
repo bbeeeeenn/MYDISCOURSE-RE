@@ -3,8 +3,8 @@
 import clsx from "clsx";
 import { addDays, format, parseISO } from "date-fns";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { getPhilippineToday } from "@/lib/date";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -24,6 +24,10 @@ const months = [
 ];
 
 export default function DatePicker({ dateParam }: { dateParam?: string }) {
+   const router = useRouter();
+   const pathname = usePathname();
+   const [isNavigating, startNavigating] = useTransition();
+
    const rootContainer = useRef<HTMLDivElement>(null);
    const sentinel = useRef<HTMLDivElement>(null);
    const selectedDate = dateParam
@@ -65,10 +69,21 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
    return (
       <div
          ref={rootContainer}
-         className="flex w-full gap-2 overflow-x-auto p-4"
+         className={clsx(
+            "flex w-full gap-2 overflow-x-auto p-4",
+            isNavigating && "pointer-events-none opacity-50",
+         )}
       >
          {dates.map((date) => (
             <DateCard
+               onClick={() => {
+                  if (!isNavigating)
+                     startNavigating(() =>
+                        router.replace(
+                           `${pathname}?date=${format(date, "yyyy-MM-dd")}`,
+                        ),
+                     );
+               }}
                key={format(date, "yyyy-MM-dd")}
                date={date}
                active={date.getTime() === selectedDate.getTime()}
@@ -79,13 +94,20 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
    );
 }
 
-function DateCard({ date, active }: { date: Date; active: boolean }) {
-   const pathname = usePathname();
+function DateCard({
+   date,
+   active,
+   onClick,
+}: {
+   date: Date;
+   active: boolean;
+   onClick: () => void;
+}) {
    const formatted = format(date, "yyyy-MM-dd");
    const isToday = formatted === getPhilippineToday();
    return (
-      <Link
-         href={`${pathname}?date=${formatted}`}
+      <button
+         onClick={onClick}
          tabIndex={-1}
          className={clsx(
             "flex min-w-20 flex-col items-center rounded-lg p-2 text-sm font-medium",
@@ -103,6 +125,6 @@ function DateCard({ date, active }: { date: Date; active: boolean }) {
          <span className="text-xs font-medium opacity-70">
             {months[date.getMonth()]}
          </span>
-      </Link>
+      </button>
    );
 }
