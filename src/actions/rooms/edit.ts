@@ -92,7 +92,7 @@ export default async function editRoom(
             return {
                ok: false,
                error: "CONFLICT",
-               message: "Room already exists",
+               message: "Such room name already exists",
             };
          }
       }

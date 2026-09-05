@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import {
    ChangeEvent,
+   Fragment,
    ReactNode,
    useActionState,
    useEffect,
@@ -18,15 +19,17 @@ import {
 import { toast } from "react-toastify";
 import deleteRoom from "@/actions/rooms/delete";
 import { roomsPage } from "@/constants";
+import { usePathname } from "next/navigation";
 
 export default function AdminControls({ room }: { room: RoomModel }) {
+   const pathname = usePathname(); // used for key
    const session = useSession();
    const editDialogRef = useRef<HTMLDialogElement>(null);
    const deleteDialogRef = useRef<HTMLDialogElement>(null);
 
    return (
       session.data?.user.role === "ADMIN" && (
-         <>
+         <Fragment key={pathname}>
             <div className="text-base-100 absolute top-3 right-3 z-100 flex gap-4">
                <button onClick={() => toggleDialog(deleteDialogRef, true)}>
                   <Trash2 size={20} />
@@ -54,7 +57,7 @@ export default function AdminControls({ room }: { room: RoomModel }) {
                   toggleDialog={(state) => toggleDialog(editDialogRef, state)}
                />
             </Dialog>
-         </>
+         </Fragment>
       )
    );
 }
@@ -221,7 +224,9 @@ function EditForm({
             location: infos.location,
             capacity: Number.parseInt(infos.capacity, 10) || room.capacity,
             imageUrl: infos.image || updatedImage?.secure_url,
-            imagePublicId: infos.image || updatedImage?.public_id,
+            imagePublicId: infos.image
+               ? room.image_public_id || undefined
+               : updatedImage?.public_id,
          });
          toast(res.ok ? res.data.message : res.message, {
             type: res.ok ? "success" : "error",
