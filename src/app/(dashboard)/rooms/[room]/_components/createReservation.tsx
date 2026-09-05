@@ -118,89 +118,94 @@ function ReservationForm({
    };
 
    return (
-      <form
-         action={formAction}
-         onSubmit={preventWhilePending}
-         className="grid gap-3 px-4 py-6"
-      >
-         <p className="font-semibold text-gray-700">{room.room_name}</p>
-         <label className="grid gap-1 text-gray-700" htmlFor="reservation-date">
-            Date
-            <input
-               id="reservation-date"
-               name="scheduledDate"
-               type="date"
-               min={today}
-               defaultValue={selectedDate}
-               required
-               className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-            />
-         </label>
-         <div className="grid grid-cols-2 gap-3">
-            <label className="grid gap-1 text-gray-700" htmlFor="start-time">
-               Start time
-               <input
-                  id="start-time"
-                  name="startTime"
-                  type="time"
-                  min="08:00"
-                  max="18:00"
-                  required
-                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-               />
-            </label>
-            <label className="grid gap-1 text-gray-700" htmlFor="end-time">
-               End time
-               <input
-                  id="end-time"
-                  name="endTime"
-                  type="time"
-                  min="08:00"
-                  max="18:00"
-                  required
-                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-               />
-            </label>
-         </div>
-         <label className="grid gap-1 text-gray-700" htmlFor="occupants">
-            Occupants
-            <input
-               id="occupants"
-               name="occupants"
-               type="number"
-               min={1}
-               max={room.capacity}
-               defaultValue={1}
-               required
-               className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-            />
-         </label>
-         <label className="grid gap-1 text-gray-700" htmlFor="purpose">
-            Purpose
-            <textarea
-               id="purpose"
-               name="purpose"
-               rows={3}
-               required
-               className="resize-y rounded-sm border-2 border-gray-500 p-1 text-lg"
-            />
-         </label>
-         {state && !state.ok && (
-            <p className="text-sm text-red-700" role="alert">
-               {state.message}
-            </p>
-         )}
-         <button
-            type="submit"
-            disabled={isPending}
-            className={clsx(
-               "bg-base-200 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-2 text-lg font-medium",
-               isPending && "opacity-75",
-            )}
+      <div className="overflow-x-auto">
+         <form
+            action={formAction}
+            onSubmit={preventWhilePending}
+            className="grid min-w-75 gap-3 px-4 py-6"
          >
-            {isPending && <LoaderCircle className="animate-spin" />}
-            {isPending ? "Creating" : "Create reservation"}
-         </button>
-      </form>
+            <p className="font-semibold text-gray-700">{room.room_name}</p>
+            <label
+               className="grid gap-1 text-gray-700"
+               htmlFor="reservation-date"
+            >
+               Date
+               <input
+                  id="reservation-date"
+                  name="scheduledDate"
+                  type="date"
+                  min={today}
+                  defaultValue={selectedDate}
+                  required
+                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
+               />
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+               <label className="grid gap-1 text-gray-700" htmlFor="start-time">
+                  Start time
+                  <input
+                     id="start-time"
+                     name="startTime"
+                     type="time"
+                     min="08:00"
+                     max="18:00"
+                     required
+                     className="rounded-sm border-2 border-gray-500 p-1 text-lg"
+                  />
+               </label>
+               <label className="grid gap-1 text-gray-700" htmlFor="end-time">
+                  End time
+                  <input
+                     id="end-time"
+                     name="endTime"
+                     type="time"
+                     min="08:00"
+                     max="18:00"
+                     required
+                     className="rounded-sm border-2 border-gray-500 p-1 text-lg"
+                  />
+               </label>
+            </div>
+            <label className="grid gap-1 text-gray-700" htmlFor="occupants">
+               Occupants
+               <input
+                  id="occupants"
+                  name="occupants"
+                  type="number"
+                  min={1}
+                  max={room.capacity}
+                  defaultValue={1}
+                  required
+                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
+               />
+            </label>
+            <label className="grid gap-1 text-gray-700" htmlFor="purpose">
+               Purpose
+               <textarea
+                  id="purpose"
+                  name="purpose"
+                  rows={3}
+                  required
+                  className="resize-y rounded-sm border-2 border-gray-500 p-1 text-lg"
+               />
+            </label>
+            {state && !state.ok && (
+               <p className="text-sm text-red-700" role="alert">
+                  {state.message}
+               </p>
+            )}
+            <button
+               type="submit"
+               disabled={isPending}
+               className={clsx(
+                  "bg-base-200 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-2 text-lg font-medium",
+                  isPending && "opacity-75",
+               )}
+            >
+               {isPending && <LoaderCircle className="animate-spin" />}
+               {isPending ? "Creating" : "Create reservation"}
+            </button>
+         </form>
+      </div>
    );
 }
