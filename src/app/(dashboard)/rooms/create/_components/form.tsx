@@ -71,6 +71,7 @@ export default function CreateRoomForm() {
             });
             setImageBlob(undefined);
             router.replace(roomsPage);
+            router.refresh();
          }
       } catch (e) {
          if (e instanceof Error) {
