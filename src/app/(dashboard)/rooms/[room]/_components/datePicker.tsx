@@ -2,7 +2,6 @@
 
 import clsx from "clsx";
 import { addDays, format, parseISO } from "date-fns";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { getPhilippineToday } from "@/lib/date";
@@ -71,7 +70,7 @@ export default function DatePicker({ dateParam }: { dateParam?: string }) {
          ref={rootContainer}
          className={clsx(
             "flex w-full gap-2 overflow-x-auto p-4",
-            isNavigating && "pointer-events-none opacity-50",
+            isNavigating && "pointer-events-none overflow-x-hidden opacity-50",
          )}
       >
          {dates.map((date) => (
