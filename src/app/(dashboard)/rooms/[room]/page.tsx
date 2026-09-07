@@ -1,6 +1,6 @@
 import { roomsPage } from "@/constants";
 import getRoom from "@/data-access-layer/room/room";
-import { ArrowLeft, MapPin, UsersRound } from "lucide-react";
+import { ArrowLeft, Clock3, MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import AdminControls from "./_components/adminControls";
@@ -8,7 +8,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import DatePicker from "./_components/datePicker";
 import CreateReservation from "./_components/createReservation";
-import getRoomReservations from "@/data-access-layer/room/reservations";
+import getRoomReservations, {
+   getOngoingRoomReservations,
+} from "@/data-access-layer/room/reservations";
 import { addDays, format, isValid, parseISO } from "date-fns";
 import { formatPhilippineTime, getPhilippineToday } from "@/lib/date";
 import { RoomModel } from "@/generated/prisma/models";
@@ -109,6 +111,9 @@ async function Suspended({
          </div>
 
          <DatePicker dateParam={selectedDate} />
+         <Suspense>
+            <OngoingReservations roomId={room.id} />
+         </Suspense>
          <div className="mt-5 p-3">
             <CreateReservation room={room} dateParam={selectedDate} />
          </div>
@@ -119,6 +124,30 @@ async function Suspended({
       </>
    );
 }
+
+async function OngoingReservations({ roomId }: { roomId: string }) {
+   const reservations = await getOngoingRoomReservations(roomId);
+   if (reservations.length === 0) return null;
+
+   return (
+      <section className="p-3 pb-0">
+         <ReservationGroup
+            title="Ongoing"
+            date={getPhilippineToday()}
+            reservations={reservations}
+         />
+      </section>
+   );
+}
+
+// function OngoingReservationsFallback() {
+//    return (
+//       <section className="animate-pulse p-3 pb-0" aria-busy="true">
+//          <div className="mb-3 h-6 w-24 rounded bg-gray-200" />
+//          <div className="h-24 rounded-lg bg-gray-200" />
+//       </section>
+//    );
+// }
 
 function ReservationsFallback() {
    return (
@@ -154,45 +183,83 @@ async function Reservations({
    room: RoomModel;
 }) {
    const reservations = await getRoomReservations(room.id, selectedDate);
+   const now = new Date();
+   const activeReservations = reservations.filter(
+      (reservation) => reservation.endTime > now,
+   );
+   const upcoming = activeReservations.filter(
+      (reservation) => reservation.startTime > now,
+   );
 
    return (
       <section className="p-3 pb-25">
-         <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-lg font-semibold">Reservations</h2>
-            <p className="text-sm text-gray-500">
-               {format(parseISO(selectedDate), "EEE, MMM d")}
-            </p>
-         </div>
-         {reservations.length === 0 ? (
+         {upcoming.length === 0 ? (
             <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500">
-               No reservations for this day.
+               No upcoming reservations for this day.
             </p>
          ) : (
-            <div className="grid gap-3">
-               {reservations.map((reservation) => (
-                  <article
-                     key={reservation.id}
-                     className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
-                  >
-                     <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="font-semibold">
-                           {formatPhilippineTime(reservation.startTime)} -{" "}
-                           {formatPhilippineTime(reservation.endTime)}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                           {reservation.occupants}{" "}
-                           {reservation.occupants === 1 ? "person" : "people"}
-                        </p>
-                     </div>
-                     <p className="mt-2 text-sm text-gray-600">
-                        Reserved by{" "}
-                        {reservation.user.name?.trim() || "Unnamed user"}
-                     </p>
-                     <p className="mt-2 text-gray-800">{reservation.purpose}</p>
-                  </article>
-               ))}
+            <div className="grid gap-6">
+               <ReservationGroup
+                  title="Reservations"
+                  date={selectedDate}
+                  reservations={upcoming}
+               />
             </div>
          )}
       </section>
+   );
+}
+
+function ReservationGroup({
+   title,
+   date,
+   reservations,
+}: {
+   title: string;
+   date: string;
+   reservations: Awaited<ReturnType<typeof getRoomReservations>>;
+}) {
+   return (
+      <div>
+         <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <span className="text-sm text-gray-500">
+               {format(parseISO(date), "EEE, MMM d")}
+            </span>
+         </div>
+         <div className="grid gap-3">
+            {reservations.map((reservation) => (
+               <article
+                  key={reservation.id}
+                  className={`rounded-lg border p-4 ${
+                     reservation.user.role === "ADMIN" ||
+                     reservation.user.role === "STAFF"
+                        ? "border-red-200 bg-red-50"
+                        : "border-gray-200 bg-white"
+                  }`}
+               >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                     <p className="flex items-center gap-2 font-semibold text-gray-900">
+                        <Clock3 className="text-secondary" size={18} />
+                        {formatPhilippineTime(reservation.startTime)} -{" "}
+                        {formatPhilippineTime(reservation.endTime)}
+                     </p>
+                     <p className="flex items-center gap-1.5 text-sm text-gray-600">
+                        <UsersRound size={16} />
+                        {reservation.occupants}{" "}
+                        {reservation.occupants === 1 ? "person" : "people"}
+                     </p>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-600">
+                     Reserved by{" "}
+                     {reservation.user.name?.trim() || "Unnamed user"}
+                  </p>
+                  <p className="mt-2 leading-6 text-gray-700">
+                     {reservation.purpose}
+                  </p>
+               </article>
+            ))}
+         </div>
+      </div>
    );
 }

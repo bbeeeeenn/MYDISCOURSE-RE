@@ -14,9 +14,25 @@ export default async function getRoomReservations(
       where: {
          roomId,
          startTime: { gte: dayStart, lt: dayEnd },
+         endTime: { gt: new Date() },
       },
       include: {
-         user: { select: { name: true } },
+         user: { select: { name: true, role: true } },
+      },
+      orderBy: { startTime: "asc" },
+   });
+}
+
+export async function getOngoingRoomReservations(roomId: string) {
+   const now = new Date();
+   return prisma.reservation.findMany({
+      where: {
+         roomId,
+         startTime: { lte: now },
+         endTime: { gt: now },
+      },
+      include: {
+         user: { select: { name: true, role: true } },
       },
       orderBy: { startTime: "asc" },
    });
