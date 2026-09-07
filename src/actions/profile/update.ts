@@ -31,9 +31,24 @@ export default async function updateProfile(
    }
 
    try {
+      const currentUser = await prisma.user.findUnique({
+         where: { id: userId },
+         select: { role: true },
+      });
+      if (!currentUser) {
+         return { ok: false, error: "NOT_FOUND", message: "User not found" };
+      }
+
       await prisma.user.update({
          where: { id: userId },
-         data: { name, id_number: idNumber, year_level: yearLevel, course },
+         data: {
+            name,
+            id_number: idNumber,
+            ...(currentUser.role === "STUDENT" && {
+               year_level: yearLevel,
+               course,
+            }),
+         },
       });
       revalidatePath(profilePage);
       return { ok: true, data: { message: "Profile updated successfully" } };

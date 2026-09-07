@@ -20,14 +20,15 @@ export default async function createReservation(
             id_number: true,
             year_level: true,
             course: true,
+            role: true,
          },
       });
       if (
          !user ||
          !user.name?.trim() ||
          !user.id_number?.trim() ||
-         !user.course?.trim() ||
-         user.year_level === null
+         (user.role === "STUDENT" &&
+            (!user.course?.trim() || user.year_level === null))
       ) {
          return {
             ok: false,
@@ -99,6 +100,14 @@ export default async function createReservation(
 
       const start = parsePhilippineDateTime(scheduledDate, startTime);
       const end = parsePhilippineDateTime(scheduledDate, endTime);
+      if (start <= new Date()) {
+         return {
+            ok: false,
+            error: "VALIDATION",
+            message: "Reservation must start in the future",
+         };
+      }
+
       const overlap = await prisma.reservation.findFirst({
          where: {
             roomId,

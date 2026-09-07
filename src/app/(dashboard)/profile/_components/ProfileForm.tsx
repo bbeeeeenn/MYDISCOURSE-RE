@@ -80,31 +80,33 @@ export default function ProfileForm({ user }: { user: Profile }) {
                className="rounded-sm border-2 border-gray-500 p-2 text-lg"
             />
          </label>
-         <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-1 text-gray-700" htmlFor="year-level">
-               Year level
-               <input
-                  id="year-level"
-                  name="yearLevel"
-                  type="number"
-                  spellCheck={false}
-                  min={1}
-                  defaultValue={user.year_level ?? ""}
-                  className="rounded-sm border-2 border-gray-500 p-2 text-lg"
-               />
-            </label>
-            <label className="grid gap-1 text-gray-700" htmlFor="course">
-               Course
-               <input
-                  id="course"
-                  name="course"
-                  spellCheck={false}
-                  type="text"
-                  defaultValue={user.course ?? ""}
-                  className="rounded-sm border-2 border-gray-500 p-2 text-lg"
-               />
-            </label>
-         </div>
+         {user.role === "STUDENT" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+               <label className="grid gap-1 text-gray-700" htmlFor="year-level">
+                  Year level
+                  <input
+                     id="year-level"
+                     name="yearLevel"
+                     type="number"
+                     spellCheck={false}
+                     min={1}
+                     defaultValue={user.year_level ?? ""}
+                     className="rounded-sm border-2 border-gray-500 p-2 text-lg"
+                  />
+               </label>
+               <label className="grid gap-1 text-gray-700" htmlFor="course">
+                  Course
+                  <input
+                     id="course"
+                     name="course"
+                     spellCheck={false}
+                     type="text"
+                     defaultValue={user.course ?? ""}
+                     className="rounded-sm border-2 border-gray-500 p-2 text-lg"
+                  />
+               </label>
+            </div>
+         )}
          <p className="text-sm text-gray-600">Account role: {user.role}</p>
          {state && !state.ok && (
             <p className="text-sm text-red-700" role="alert">

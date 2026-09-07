@@ -2,7 +2,7 @@
 
 import {
    historyPage,
-   homePage,
+   // homePage,
    notificationsPage,
    myReservationsPage,
    roomsPage,
@@ -22,7 +22,7 @@ import {
    ChevronRight,
    CircleUserRound,
    DoorOpen,
-   House,
+   // House,
    LogIn,
    LucideIcon,
    Menu,

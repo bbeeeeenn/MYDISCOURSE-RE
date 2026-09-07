@@ -106,13 +106,20 @@ function ReservationForm({
          ? new Date(`${date.value}T00:00:00`)
          : null;
       const isWeekday = selectedDate !== null && selectedDate.getDay() !== 0;
+      const isFuture =
+         Boolean(date.value && startTime.value && endTime.value) &&
+         new Date(`${date.value}T${startTime.value}:00`).getTime() > Date.now();
       const validHours =
          startTime.value >= "08:00" &&
          endTime.value <= "18:00" &&
          startTime.value < endTime.value;
 
       date.setCustomValidity(
-         isWeekday ? "" : "Reservations are available Monday through Saturday",
+         !isWeekday
+            ? "Reservations are available Monday through Saturday"
+            : !isFuture
+              ? "Reservation must start in the future"
+              : "",
       );
       startTime.setCustomValidity(
          validHours ? "" : "Choose a time between 8:00 AM and 6:00 PM",
@@ -121,7 +128,8 @@ function ReservationForm({
          validHours ? "" : "Choose a time between 8:00 AM and 6:00 PM",
       );
 
-      if (isPending || !isWeekday || !validHours) event.preventDefault();
+      if (isPending || !isWeekday || !isFuture || !validHours)
+         event.preventDefault();
    };
 
    return (
