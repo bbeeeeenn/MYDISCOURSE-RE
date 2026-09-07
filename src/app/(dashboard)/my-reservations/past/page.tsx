@@ -1,5 +1,5 @@
 import { myReservationsPage, reservationsPageSize } from "@/constants";
-import { getPastReservations } from "@/data-access-layer/reservations/pastReservations";
+import { getPastReservations } from "@/data-access-layer/reservations/myReservations";
 import { CalendarDays, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";

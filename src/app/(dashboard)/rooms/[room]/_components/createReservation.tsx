@@ -6,7 +6,14 @@ import createReservation from "@/actions/reservations/create";
 import { profilePage } from "@/constants";
 import { getPhilippineToday } from "@/lib/date";
 import clsx from "clsx";
-import { LoaderCircle, Plus } from "lucide-react";
+import {
+   CalendarDays,
+   Clock3,
+   FileText,
+   LoaderCircle,
+   Plus,
+   UsersRound,
+} from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SubmitEvent, useActionState, useRef } from "react";
 import { toast } from "react-toastify";
@@ -122,73 +129,113 @@ function ReservationForm({
          <form
             action={formAction}
             onSubmit={preventWhilePending}
-            className="grid min-w-75 gap-3 px-4 py-6"
+            className="grid max-h-120 min-w-75 gap-5 overflow-y-auto px-4 py-5 sm:px-6"
          >
-            <p className="font-semibold text-gray-700">{room.room_name}</p>
-            <label
-               className="grid gap-1 text-gray-700"
-               htmlFor="reservation-date"
-            >
-               Date
-               <input
-                  id="reservation-date"
-                  name="scheduledDate"
-                  type="date"
-                  min={today}
-                  defaultValue={selectedDate}
-                  required
-                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-               />
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-               <label className="text-gray-700" htmlFor="start-time">
-                  Start time
-                  <input
-                     id="start-time"
-                     name="startTime"
-                     type="time"
-                     min="08:00"
-                     max="18:00"
-                     required
-                     className="w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
-                  />
-               </label>
-               <label className="text-gray-700" htmlFor="end-time">
-                  End time
-                  <input
-                     id="end-time"
-                     name="endTime"
-                     type="time"
-                     min="08:00"
-                     max="18:00"
-                     required
-                     className="w-full rounded-sm border-2 border-gray-500 p-1 text-lg"
-                  />
-               </label>
+            <div className="mb-2 space-y-2">
+               <p className="text-base-400 text-xl font-bold">
+                  {room.room_name}
+               </p>
+               <p className="text-sm text-gray-600">
+                  Capacity: {room.capacity} people
+               </p>
             </div>
-            <label className="grid gap-1 text-gray-700" htmlFor="occupants">
-               Occupants
-               <input
-                  id="occupants"
-                  name="occupants"
-                  type="number"
-                  min={1}
-                  max={room.capacity}
-                  defaultValue={1}
-                  required
-                  className="rounded-sm border-2 border-gray-500 p-1 text-lg"
-               />
-            </label>
-            <label className="grid gap-1 text-gray-700" htmlFor="purpose">
-               Purpose
-               <textarea
-                  id="purpose"
-                  name="purpose"
-                  rows={3}
-                  required
-                  className="resize-y rounded-sm border-2 border-gray-500 p-1 text-lg"
-               />
-            </label>
+
+            <fieldset className="grid gap-3">
+               <legend className="mb-1 flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                  <CalendarDays className="text-secondary" size={18} />
+                  Schedule
+               </legend>
+               <label
+                  className="grid gap-1.5 text-sm font-medium text-gray-700"
+                  htmlFor="reservation-date"
+               >
+                  Date
+                  <input
+                     id="reservation-date"
+                     name="scheduledDate"
+                     type="date"
+                     min={today}
+                     defaultValue={selectedDate}
+                     required
+                     className="rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
+                  />
+               </label>
+               <div className="grid grid-cols-2 gap-3">
+                  <label
+                     className="grid gap-1.5 text-sm font-medium text-gray-700"
+                     htmlFor="start-time"
+                  >
+                     Start time
+                     <input
+                        id="start-time"
+                        name="startTime"
+                        type="time"
+                        min="08:00"
+                        max="18:00"
+                        required
+                        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
+                     />
+                  </label>
+                  <label
+                     className="grid gap-1.5 text-sm font-medium text-gray-700"
+                     htmlFor="end-time"
+                  >
+                     End time
+                     <input
+                        id="end-time"
+                        name="endTime"
+                        type="time"
+                        min="08:00"
+                        max="18:00"
+                        required
+                        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
+                     />
+                  </label>
+               </div>
+               <p className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <Clock3 size={14} /> Reservations are available Monday to
+                  Saturday, 8:00 AM to 6:00 PM.
+               </p>
+            </fieldset>
+
+            <fieldset className="grid gap-3 border-t border-gray-200 pt-4">
+               <legend className="mb-1 flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                  <FileText className="text-secondary" size={18} />
+                  Reservation details
+               </legend>
+               <label
+                  className="grid gap-1.5 text-sm font-medium text-gray-700"
+                  htmlFor="occupants"
+               >
+                  <span className="flex items-center gap-1.5">
+                     <UsersRound size={16} /> Occupants
+                  </span>
+                  <input
+                     id="occupants"
+                     name="occupants"
+                     type="number"
+                     min={1}
+                     max={room.capacity}
+                     defaultValue={1}
+                     required
+                     className="rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
+                  />
+               </label>
+               <label
+                  className="grid gap-1.5 text-sm font-medium text-gray-700"
+                  htmlFor="purpose"
+               >
+                  Purpose
+                  <textarea
+                     id="purpose"
+                     name="purpose"
+                     rows={3}
+                     placeholder="What will the room be used for?"
+                     required
+                     className="resize-y rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none placeholder:text-gray-400"
+                  />
+               </label>
+            </fieldset>
             {state && !state.ok && (
                <p className="text-sm text-red-700" role="alert">
                   {state.message}
@@ -198,7 +245,7 @@ function ReservationForm({
                type="submit"
                disabled={isPending}
                className={clsx(
-                  "bg-base-200 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-2 text-lg font-medium",
+                  "bg-base-300 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
                   isPending && "opacity-75",
                )}
             >
