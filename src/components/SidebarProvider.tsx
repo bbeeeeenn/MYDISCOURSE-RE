@@ -47,7 +47,6 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    ],
    STUDENT: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
-      { icon: House, label: "Home", link: homePage },
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Scroll, label: "History", link: historyPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
@@ -55,8 +54,8 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    ],
    STAFF: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
-      { icon: House, label: "Home", link: homePage },
       { icon: QrCode, label: "Scan", link: scanPage },
+      { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: Scroll, label: "Logs", link: logsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
@@ -65,8 +64,8 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    ],
    ADMIN: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
-      { icon: House, label: "Home", link: homePage },
       { icon: QrCode, label: "Scan", link: scanPage },
+      { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: Scroll, label: "Logs", link: logsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
