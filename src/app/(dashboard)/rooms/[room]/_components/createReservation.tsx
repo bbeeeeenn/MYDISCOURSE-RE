@@ -15,8 +15,9 @@ import {
    UsersRound,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { SubmitEvent, useActionState, useRef } from "react";
+import { SubmitEvent, useActionState, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function CreateReservation({
    room,
@@ -91,6 +92,8 @@ function ReservationForm({
       },
       undefined,
    );
+   const [acceptedTermsAndConditions, setAcceptedTermsAndConditions] =
+      useState(false);
 
    const preventWhilePending = (event: SubmitEvent<HTMLFormElement>) => {
       const date = event.currentTarget.elements.namedItem(
@@ -128,17 +131,22 @@ function ReservationForm({
          validHours ? "" : "Choose a time between 8:00 AM and 6:00 PM",
       );
 
-      if (isPending || !isWeekday || !isFuture || !validHours)
+      if (
+         isPending ||
+         !acceptedTermsAndConditions ||
+         !isWeekday ||
+         !isFuture ||
+         !validHours
+      )
          event.preventDefault();
    };
-
    return (
-      <div className="overflow-x-auto">
-         <form
-            action={formAction}
-            onSubmit={preventWhilePending}
-            className="grid max-h-120 min-w-75 gap-5 overflow-y-auto px-4 py-5 sm:px-6"
-         >
+      <form
+         action={formAction}
+         onSubmit={preventWhilePending}
+         className="flex min-w-75 flex-col"
+      >
+         <div className="grid max-h-110 gap-5 overflow-y-auto px-4 py-5 sm:px-6">
             <div className="mb-2 space-y-2">
                <p className="text-base-400 text-xl font-bold">
                   {room.room_name}
@@ -240,7 +248,7 @@ function ReservationForm({
                      rows={3}
                      placeholder="What will the room be used for?"
                      required
-                     className="resize-y rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none placeholder:text-gray-400"
+                     className="h-24 max-h-24 min-h-24 resize-none rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none placeholder:text-gray-400"
                   />
                </label>
             </fieldset>
@@ -249,18 +257,42 @@ function ReservationForm({
                   {state.message}
                </p>
             )}
+         </div>
+         <div className="flex flex-col gap-y-1 border-t border-gray-200 p-2">
+            <div className="flex items-start gap-x-2 px-2">
+               <input
+                  type="checkbox"
+                  name="tc"
+                  id="tc"
+                  checked={acceptedTermsAndConditions}
+                  onChange={(e) =>
+                     setAcceptedTermsAndConditions(e.target.checked)
+                  }
+                  className="accent-base-300 mt-1.5"
+               />
+               <label htmlFor="tc" className="text-justify">
+                  I agree to the{" "}
+                  <Link href={""} className="text-blue-400 underline">
+                     terms and conditions
+                  </Link>{" "}
+                  to use this room responsibly, keep noise low, leave it clean,
+                  and vacate on time. I understand misuse may result in
+                  suspended access.
+               </label>
+            </div>
             <button
                type="submit"
-               disabled={isPending}
+               inert={isPending || !acceptedTermsAndConditions}
+               disabled={isPending || !acceptedTermsAndConditions}
                className={clsx(
-                  "bg-base-300 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
-                  isPending && "opacity-75",
+                  "bg-base-300 text-base-100 mt-1 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
+                  (isPending || !acceptedTermsAndConditions) && "opacity-50",
                )}
             >
                {isPending && <LoaderCircle className="animate-spin" />}
                {isPending ? "Creating" : "Create reservation"}
             </button>
-         </form>
-      </div>
+         </div>
+      </form>
    );
 }
