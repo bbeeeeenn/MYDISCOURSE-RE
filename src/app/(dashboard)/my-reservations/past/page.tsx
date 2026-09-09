@@ -1,5 +1,13 @@
-import { myReservationsPage, reservationsPageSize } from "@/constants";
+import {
+   myReservationsPage,
+   pastReservationsPage,
+   reservationsPageSize,
+} from "@/constants";
 import { getPastReservations } from "@/data-access-layer/reservations/myReservations";
+import getRooms from "@/data-access-layer/room/rooms";
+import ReservationFilters, {
+   formatFilterDate,
+} from "../../reservations/_components/ReservationFilters";
 import { CalendarDays, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -14,14 +22,25 @@ function parsePage(value: string | undefined) {
 async function Suspended({
    searchParams,
 }: {
-   searchParams: Promise<{ pastPage?: string }>;
+   searchParams: Promise<{
+      pastPage?: string;
+      roomId?: string;
+      date?: string;
+   }>;
 }) {
    const params = await searchParams;
    const page = parsePage(params.pastPage);
-   const { past, pastTotal } = await getPastReservations({
-      page,
-      pageSize: reservationsPageSize,
-   });
+   const roomId = params.roomId || undefined;
+   const date = formatFilterDate(params.date);
+   const [{ past, pastTotal }, rooms] = await Promise.all([
+      getPastReservations({
+         page,
+         pageSize: reservationsPageSize,
+         roomId,
+         date,
+      }),
+      getRooms(),
+   ]);
 
    return (
       <div className="min-h-[calc(100vh-3.5rem)] bg-gray-50 p-4 pb-12 sm:p-8">
@@ -51,6 +70,12 @@ async function Suspended({
          </header>
 
          <main className="mx-auto mt-8 max-w-5xl">
+            <ReservationFilters
+               rooms={rooms}
+               pathname={pastReservationsPage}
+               roomId={roomId}
+               date={date}
+            />
             <div className="mb-3 flex items-center justify-between">
                <h2 className="text-xl font-semibold">Completed bookings</h2>
                <span className="text-sm text-gray-500">
@@ -73,6 +98,7 @@ async function Suspended({
                      total={pastTotal}
                      param="pastPage"
                      pageSize={reservationsPageSize}
+                     query={{ roomId, date }}
                   />
                </>
             ) : (
@@ -119,7 +145,11 @@ function ReservationsFallback() {
 export default async function PastReservationsPage({
    searchParams,
 }: {
-   searchParams: Promise<{ pastPage?: string }>;
+   searchParams: Promise<{
+      pastPage?: string;
+      roomId?: string;
+      date?: string;
+   }>;
 }) {
    return (
       <Suspense fallback={<ReservationsFallback />}>

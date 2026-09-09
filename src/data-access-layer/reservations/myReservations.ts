@@ -1,10 +1,14 @@
 import { roomsPage } from "@/constants";
 import { auth } from "@/lib/auth";
+import { parsePhilippineDate } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { addDays } from "date-fns";
 
 const reservationSelect = {
-   room: { select: { room_name: true, location: true, capacity: true } },
+   room: {
+      select: { id: true, room_name: true, location: true, capacity: true },
+   },
 };
 
 export async function getMyReservations({
@@ -47,9 +51,13 @@ export async function getMyReservations({
 export async function getPastReservations({
    page,
    pageSize,
+   roomId,
+   date,
 }: {
    page: number;
    pageSize: number;
+   roomId?: string;
+   date?: string;
 }) {
    const session = await auth();
    if (!session?.user) redirect(roomsPage);
@@ -57,6 +65,15 @@ export async function getPastReservations({
    const where = {
       userId: session.user.id,
       endTime: { lte: new Date() },
+      ...(roomId ? { roomId } : {}),
+      ...(date
+         ? {
+              startTime: {
+                 gte: parsePhilippineDate(date),
+                 lt: addDays(parsePhilippineDate(date), 1),
+              },
+           }
+         : {}),
    };
    const [past, pastTotal] = await Promise.all([
       prisma.reservation.findMany({

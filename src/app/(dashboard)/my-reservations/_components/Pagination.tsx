@@ -5,16 +5,25 @@ export default function Pagination({
    total,
    param,
    pageSize,
+   query,
 }: {
    page: number;
    total: number;
    param: string;
    pageSize: number;
+   query?: Record<string, string | undefined>;
 }) {
    const totalPages = Math.ceil(total / pageSize);
    if (totalPages <= 1) return null;
 
-   const hrefFor = (nextPage: number) => `?${param}=${nextPage}`;
+   const hrefFor = (nextPage: number) => {
+      const params = new URLSearchParams();
+      params.set(param, String(nextPage));
+      Object.entries(query ?? {}).forEach(([key, value]) => {
+         if (value) params.set(key, value);
+      });
+      return `?${params.toString()}`;
+   };
 
    return (
       <nav
