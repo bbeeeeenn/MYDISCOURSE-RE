@@ -37,7 +37,7 @@ async function Suspended({
          roomId,
          date,
       }),
-      getRooms(),
+      getRooms({ id: true, room_name: true }),
    ]);
 
    return (
