@@ -68,7 +68,7 @@ export default function Home() {
         {/* Card 2 */}
         <div className="text-base-100 relative max-h-95 min-h-95 overflow-hidden rounded-2xl">
           <div className="absolute inset-0 z-10 space-y-3 p-7">
-            <p className="text-2xl font-bold">01</p>
+            <p className="text-2xl font-bold">02</p>
             <p className="text-lg font-bold">CONTRIBUTE</p>
             <p className="text-sm">
               Share your knowledge and insights to help others.
@@ -85,7 +85,7 @@ export default function Home() {
         {/* Card 3 */}
         <div className="text-base-100 relative max-h-95 min-h-95 overflow-hidden rounded-2xl">
           <div className="absolute inset-0 z-10 space-y-3 p-7">
-            <p className="text-2xl font-bold">01</p>
+            <p className="text-2xl font-bold">03</p>
             <p className="text-lg font-bold">CONNECT</p>
             <p className="text-sm">
               Build connections and network with like-minded individuals.
