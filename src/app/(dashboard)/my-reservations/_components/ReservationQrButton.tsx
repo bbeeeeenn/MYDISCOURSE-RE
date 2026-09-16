@@ -58,8 +58,8 @@ export default function ReservationQrButton({
          >
             <div className="grid justify-items-center gap-4 p-5">
                <p className="max-w-md text-center text-sm leading-6 text-gray-700">
-                  Present this QR code to staff or an administrator as a
-                  reference for your reservation.
+                  Present this QR code to staff as a reference for your
+                  reservation.
                </p>
                {qrCode ? (
                   <Image
