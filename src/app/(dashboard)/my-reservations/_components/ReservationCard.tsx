@@ -9,6 +9,7 @@ import {
 import { format } from "date-fns";
 import CancelReservationButton from "./CancelReservationButton";
 import EditReservationButton from "./EditReservationButton";
+import ReservationQrButton from "./ReservationQrButton";
 import Link from "next/link";
 import { roomsPage } from "@/constants";
 
@@ -32,15 +33,18 @@ export default function ReservationCard({
    return (
       <article className="bg-base-100 border-base-200/30 rounded-lg border p-4 shadow-sm">
          <Link
+            inert={status === "past"}
             href={`${roomsPage}/${reservation.room.id}?date=${date.date}`}
             className="group flex flex-wrap items-start justify-between gap-3"
          >
             <div>
                <p className="text-base-400 flex items-center gap-1 text-lg font-semibold group-hover:underline">
                   {reservation.room.room_name}
-                  <span>
-                     <ChevronRight size={20} />
-                  </span>
+                  {status !== "past" && (
+                     <span>
+                        <ChevronRight size={20} />
+                     </span>
+                  )}
                </p>
                <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
                   <MapPin size={16} />
@@ -86,6 +90,7 @@ export default function ReservationCard({
          </p>
          {status === "upcoming" && (
             <div className="mt-4 flex flex-wrap gap-4 border-t border-gray-200 pt-3">
+               <ReservationQrButton reservationId={reservation.id} />
                <EditReservationButton
                   reservationId={reservation.id}
                   roomName={reservation.room.room_name}

@@ -285,7 +285,7 @@ function ReservationForm({
                inert={isPending || !acceptedTermsAndConditions}
                disabled={isPending || !acceptedTermsAndConditions}
                className={clsx(
-                  "bg-base-300 text-base-100 mt-1 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
+                  "bg-base-300 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
                   (isPending || !acceptedTermsAndConditions) && "opacity-50",
                )}
             >

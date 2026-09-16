@@ -184,10 +184,8 @@ async function Reservations({
 }) {
    const reservations = await getRoomReservations(room.id, selectedDate);
    const now = new Date();
-   const activeReservations = reservations.filter(
-      (reservation) => reservation.endTime > now,
-   );
-   const upcoming = activeReservations.filter(
+
+   const upcoming = reservations.filter(
       (reservation) => reservation.startTime > now,
    );
 

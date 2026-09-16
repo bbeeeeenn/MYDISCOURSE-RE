@@ -50,6 +50,7 @@ export async function getCompletedReservations({
 
    const where = {
       endTime: { lte: new Date() },
+      NOT: { checkedInAt: null },
       ...getReservationFilters(roomId, date),
    };
    const [completed, completedTotal] = await Promise.all([

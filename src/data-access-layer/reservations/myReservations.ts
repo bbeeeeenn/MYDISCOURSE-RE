@@ -4,6 +4,7 @@ import { parsePhilippineDate } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { addDays } from "date-fns";
+import { ReservationWhereInput } from "@/generated/prisma/models";
 
 const reservationSelect = {
    room: {
@@ -62,8 +63,9 @@ export async function getPastReservations({
    const session = await auth();
    if (!session?.user) redirect(roomsPage);
 
-   const where = {
+   const where: ReservationWhereInput = {
       userId: session.user.id,
+      NOT: { checkedInAt: null },
       endTime: { lte: new Date() },
       ...(roomId ? { roomId } : {}),
       ...(date

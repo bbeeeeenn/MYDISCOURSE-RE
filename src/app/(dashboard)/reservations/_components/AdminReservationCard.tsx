@@ -1,4 +1,4 @@
-import { formatPhilippineTime, getPhilippineDateTimeInputs } from "@/lib/date";
+import { formatPhilippineTime } from "@/lib/date";
 import {
    CalendarDays,
    ChevronRight,
@@ -8,8 +8,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
-import DeleteReservationButton from "./DeleteReservationButton";
-import { roomsPage } from "@/constants";
+import { reservationsPage } from "@/constants";
 
 type AdminReservation = {
    id: string;
@@ -32,7 +31,6 @@ export default function AdminReservationCard({
          : reservation.startTime <= new Date()
            ? "Ongoing"
            : "Upcoming";
-   const date = getPhilippineDateTimeInputs(reservation.startTime).date;
    const statusClass =
       status === "Completed"
          ? "bg-gray-100 text-gray-600"
@@ -43,7 +41,7 @@ export default function AdminReservationCard({
    return (
       <article className="bg-base-100 border-base-200/30 rounded-lg border p-4 shadow-sm">
          <Link
-            href={`${roomsPage}/${reservation.room.id}?date=${date}`}
+            href={`${reservationsPage}/${reservation.id}`}
             className="group flex flex-wrap items-start justify-between gap-3"
          >
             <div className="min-w-0">
@@ -95,10 +93,6 @@ export default function AdminReservationCard({
                <span className="font-semibold">Purpose:</span>{" "}
                {reservation.purpose}
             </p>
-         </div>
-
-         <div className="mt-4 border-t border-gray-200 pt-3">
-            <DeleteReservationButton reservationId={reservation.id} />
          </div>
       </article>
    );
