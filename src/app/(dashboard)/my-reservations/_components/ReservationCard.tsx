@@ -19,6 +19,7 @@ export type Reservation = {
    endTime: Date;
    occupants: number;
    purpose: string;
+   checkedInAt: Date | null;
    room: { room_name: string; location: string; capacity: number; id: string };
 };
 
@@ -27,7 +28,7 @@ export default function ReservationCard({
    status,
 }: {
    reservation: Reservation;
-   status: "upcoming" | "ongoing" | "past";
+   status: "upcoming" | "pending" | "ongoing" | "past";
 }) {
    const date = getPhilippineDateTimeInputs(reservation.startTime);
    return (
@@ -55,16 +56,20 @@ export default function ReservationCard({
                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                   status === "past"
                      ? "bg-gray-100 text-gray-600"
-                     : status === "ongoing"
-                       ? "bg-amber-100 text-amber-700"
-                       : "bg-green-100 text-green-700"
+                     : status === "pending"
+                       ? "bg-yellow-100 text-yellow-700"
+                       : status === "ongoing"
+                         ? "bg-amber-100 text-amber-700"
+                         : "bg-green-100 text-green-700"
                }`}
             >
                {status === "past"
                   ? "Completed"
-                  : status === "ongoing"
-                    ? "Ongoing"
-                    : "Upcoming"}
+                  : status === "pending"
+                    ? "Pending"
+                    : status === "ongoing"
+                      ? "Ongoing"
+                      : "Upcoming"}
             </span>
          </Link>
 
@@ -88,9 +93,9 @@ export default function ReservationCard({
          <p className="mt-4 text-sm leading-6 text-gray-700">
             {reservation.purpose}
          </p>
-         {status === "upcoming" && (
-            <div className="mt-4 flex flex-wrap gap-4 border-t border-gray-200 pt-3">
-               <ReservationQrButton reservationId={reservation.id} />
+         <div className="mt-4 flex flex-wrap gap-4 border-t border-gray-200 pt-3">
+            <ReservationQrButton reservationId={reservation.id} />
+            {status === "upcoming" && (
                <EditReservationButton
                   reservationId={reservation.id}
                   roomName={reservation.room.room_name}
@@ -105,9 +110,9 @@ export default function ReservationCard({
                   occupants={reservation.occupants}
                   purpose={reservation.purpose}
                />
-               <CancelReservationButton reservationId={reservation.id} />
-            </div>
-         )}
+            )}
+            <CancelReservationButton reservationId={reservation.id} />
+         </div>
       </article>
    );
 }

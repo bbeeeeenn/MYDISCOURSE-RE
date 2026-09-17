@@ -90,7 +90,7 @@ async function Suspended({
       now < reservation.endTime;
    const canCheckOut =
       !isCompleted && !!reservation.checkedInAt && !reservation.checkedOutAt;
-   const canCancel = reservation.startTime > now && !reservation.checkedInAt;
+   const canCancel = !reservation.checkedInAt;
    const reservationDate = getPhilippineDateTimeInputs(
       reservation.startTime,
    ).date;

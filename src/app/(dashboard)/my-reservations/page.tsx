@@ -22,6 +22,7 @@ async function Suspended({
       upcomingPage: upcomingPageParams,
       pageSize: reservationsPageSize,
    });
+   const now = new Date();
 
    return (
       <div className="min-h-[calc(100vh-3.5rem)] bg-gray-50 p-4 pb-12 sm:p-8">
@@ -71,7 +72,12 @@ async function Suspended({
                            <ReservationCard
                               key={reservation.id}
                               reservation={reservation}
-                              status="upcoming"
+                              status={
+                                 reservation.startTime <= now &&
+                                 !reservation.checkedInAt
+                                    ? "pending"
+                                    : "upcoming"
+                              }
                            />
                         ))}
                      </div>

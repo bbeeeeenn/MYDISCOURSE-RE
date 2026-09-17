@@ -67,7 +67,7 @@ async function Suspended({
                date={date}
             />
             <ReservationSection
-               title="Upcoming reservations"
+               title="Reservations"
                emptyTitle="No upcoming reservations"
                emptyDescription="Upcoming reservations made by users will appear here."
                reservations={upcoming}

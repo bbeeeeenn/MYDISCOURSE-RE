@@ -24,6 +24,18 @@ export async function getMyReservations({
 
    const now = new Date();
    const userId = session.user.id;
+   const upcomingWhere: ReservationWhereInput = {
+      userId,
+      checkedOutAt: null,
+      OR: [
+         { startTime: { gt: now } },
+         {
+            startTime: { lte: now },
+            endTime: { gt: now },
+            checkedInAt: null,
+         },
+      ],
+   };
    const [ongoing, upcoming, upcomingTotal] = await Promise.all([
       prisma.reservation.findMany({
          where: {
@@ -37,14 +49,14 @@ export async function getMyReservations({
          orderBy: { startTime: "asc" },
       }),
       prisma.reservation.findMany({
-         where: { userId, startTime: { gt: now } },
+         where: upcomingWhere,
          include: reservationSelect,
          orderBy: { startTime: "asc" },
          skip: (upcomingPage - 1) * pageSize,
          take: pageSize,
       }),
       prisma.reservation.count({
-         where: { userId, startTime: { gt: now } },
+         where: upcomingWhere,
       }),
    ]);
 
