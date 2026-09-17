@@ -89,9 +89,7 @@ async function Suspended({
       reservation.startTime <= now &&
       now < reservation.endTime;
    const canCheckOut =
-      !isCompleted &&
-      !!reservation.checkedInAt &&
-      !reservation.checkedOutAt;
+      !isCompleted && !!reservation.checkedInAt && !reservation.checkedOutAt;
    const canCancel = reservation.startTime > now && !reservation.checkedInAt;
    const reservationDate = getPhilippineDateTimeInputs(
       reservation.startTime,
@@ -218,7 +216,7 @@ async function Suspended({
                      {reservation.checkedInAt && (
                         <p>
                            <span className="font-semibold text-gray-900">
-                              Timed in:
+                              Checked in:
                            </span>{" "}
                            {formatPhilippineTime(reservation.checkedInAt)}
                         </p>
@@ -226,7 +224,7 @@ async function Suspended({
                      {reservation.checkedOutAt && (
                         <p>
                            <span className="font-semibold text-gray-900">
-                              Timed out:
+                              Checked out:
                            </span>{" "}
                            {formatPhilippineTime(reservation.checkedOutAt)}
                         </p>

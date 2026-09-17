@@ -237,11 +237,24 @@ function ReservationGroup({
                   }`}
                >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                     <p className="flex items-center gap-2 font-semibold text-gray-900">
-                        <Clock3 className="text-secondary" size={18} />
-                        {formatPhilippineTime(reservation.startTime)} -{" "}
-                        {formatPhilippineTime(reservation.endTime)}
-                     </p>
+                     <div className="flex flex-wrap items-center gap-2">
+                        <p className="flex items-center gap-2 font-semibold text-gray-900">
+                           <Clock3 className="text-secondary" size={18} />
+                           {formatPhilippineTime(reservation.startTime)} -{" "}
+                           {formatPhilippineTime(reservation.endTime)}
+                        </p>
+                        {title === "Ongoing" && (
+                           <span
+                              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                 reservation.checkedInAt
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                              }`}
+                           >
+                              {reservation.checkedInAt ? "Ongoing" : "Pending"}
+                           </span>
+                        )}
+                     </div>
                      <p className="flex items-center gap-1.5 text-sm text-gray-600">
                         <UsersRound size={16} />
                         {reservation.occupants}{" "}

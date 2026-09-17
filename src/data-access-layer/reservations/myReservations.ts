@@ -28,6 +28,8 @@ export async function getMyReservations({
       prisma.reservation.findMany({
          where: {
             userId,
+            NOT: { checkedInAt: null },
+            checkedOutAt: null,
             startTime: { lte: now },
             endTime: { gt: now },
          },
@@ -49,7 +51,7 @@ export async function getMyReservations({
    return { ongoing, upcoming, upcomingTotal };
 }
 
-export async function getPastReservations({
+export async function getMyCompletedReservations({
    page,
    pageSize,
    roomId,
@@ -66,7 +68,7 @@ export async function getPastReservations({
    const where: ReservationWhereInput = {
       userId: session.user.id,
       NOT: { checkedInAt: null },
-      endTime: { lte: new Date() },
+      OR: [{ endTime: { lte: new Date() } }, { NOT: { checkedOutAt: null } }],
       ...(roomId ? { roomId } : {}),
       ...(date
          ? {

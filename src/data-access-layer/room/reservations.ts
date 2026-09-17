@@ -29,7 +29,6 @@ export async function getOngoingRoomReservations(roomId: string) {
    return prisma.reservation.findMany({
       where: {
          roomId,
-         checkedInAt: { lte: now },
          checkedOutAt: null,
          startTime: { lte: now },
          endTime: { gt: now },

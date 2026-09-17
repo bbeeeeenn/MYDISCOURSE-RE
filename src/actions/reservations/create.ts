@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { parsePhilippineDateTime } from "@/lib/date";
 import prisma from "@/lib/prisma";
+import { addMinutes } from "date-fns";
 
 export default async function createReservation(
    roomId: string,
@@ -100,11 +101,12 @@ export default async function createReservation(
 
       const start = parsePhilippineDateTime(scheduledDate, startTime);
       const end = parsePhilippineDateTime(scheduledDate, endTime);
-      if (start <= new Date()) {
+      const now = new Date();
+      if (end <= now || addMinutes(start, 10) <= now) {
          return {
             ok: false,
             error: "VALIDATION",
-            message: "Reservation must start in the future",
+            message: "The reservation time window has already passed",
          };
       }
 
@@ -113,6 +115,7 @@ export default async function createReservation(
             roomId,
             startTime: { lt: end },
             endTime: { gt: start },
+            checkedOutAt: { gt: start },
          },
       });
       if (overlap) {

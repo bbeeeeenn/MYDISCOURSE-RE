@@ -16,6 +16,8 @@ type AdminReservation = {
    endTime: Date;
    occupants: number;
    purpose: string;
+   checkedInAt: Date | null;
+   checkedOutAt: Date | null;
    room: { id: string; room_name: string; location: string };
    user: { name: string | null; email: string | null };
 };
@@ -25,18 +27,23 @@ export default function AdminReservationCard({
 }: {
    reservation: AdminReservation;
 }) {
+   const now = new Date();
    const status =
-      reservation.endTime <= new Date()
+      reservation.endTime <= now || reservation.checkedOutAt
          ? "Completed"
-         : reservation.startTime <= new Date()
-           ? "Ongoing"
+         : reservation.startTime <= now
+           ? reservation.checkedInAt
+              ? "Ongoing"
+              : "Pending"
            : "Upcoming";
    const statusClass =
       status === "Completed"
          ? "bg-gray-100 text-gray-600"
          : status === "Ongoing"
            ? "bg-amber-100 text-amber-700"
-           : "bg-green-100 text-green-700";
+           : status === "Pending"
+             ? "bg-yellow-100 text-yellow-700"
+             : "bg-green-100 text-green-700";
 
    return (
       <article className="bg-base-100 border-base-200/30 rounded-lg border p-4 shadow-sm">

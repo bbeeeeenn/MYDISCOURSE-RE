@@ -4,7 +4,7 @@ import { Dialog, toggleDialog } from "@/components/ui/Dialog";
 import { RoomModel } from "@/generated/prisma/models";
 import createReservation from "@/actions/reservations/create";
 import { profilePage } from "@/constants";
-import { getPhilippineToday } from "@/lib/date";
+import { getPhilippineToday, parsePhilippineDateTime } from "@/lib/date";
 import clsx from "clsx";
 import {
    CalendarDays,
@@ -109,9 +109,20 @@ function ReservationForm({
          ? new Date(`${date.value}T00:00:00`)
          : null;
       const isWeekday = selectedDate !== null && selectedDate.getDay() !== 0;
-      const isFuture =
-         Boolean(date.value && startTime.value && endTime.value) &&
-         new Date(`${date.value}T${startTime.value}:00`).getTime() > Date.now();
+      const start =
+         date.value && startTime.value
+            ? parsePhilippineDateTime(date.value, startTime.value)
+            : null;
+      const end =
+         date.value && endTime.value
+            ? parsePhilippineDateTime(date.value, endTime.value)
+            : null;
+      const now = Date.now();
+      const isWithinBookingWindow =
+         start !== null &&
+         end !== null &&
+         start.getTime() + 10 * 60 * 1000 > now &&
+         end.getTime() > now;
       const validHours =
          startTime.value >= "08:00" &&
          endTime.value <= "18:00" &&
@@ -120,8 +131,8 @@ function ReservationForm({
       date.setCustomValidity(
          !isWeekday
             ? "Reservations are available Monday through Saturday"
-            : !isFuture
-              ? "Reservation must start in the future"
+            : !isWithinBookingWindow
+              ? "The reservation time window has already passed"
               : "",
       );
       startTime.setCustomValidity(
@@ -135,7 +146,7 @@ function ReservationForm({
          isPending ||
          !acceptedTermsAndConditions ||
          !isWeekday ||
-         !isFuture ||
+         !isWithinBookingWindow ||
          !validHours
       )
          event.preventDefault();

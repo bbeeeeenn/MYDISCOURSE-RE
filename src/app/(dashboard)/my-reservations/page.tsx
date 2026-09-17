@@ -17,9 +17,9 @@ async function Suspended({
    searchParams: Promise<{ upcomingPage?: string }>;
 }) {
    const params = await searchParams;
-   const upcomingPage = parsePage(params.upcomingPage);
+   const upcomingPageParams = parsePage(params.upcomingPage);
    const { ongoing, upcoming, upcomingTotal } = await getMyReservations({
-      upcomingPage,
+      upcomingPage: upcomingPageParams,
       pageSize: reservationsPageSize,
    });
 
@@ -76,7 +76,7 @@ async function Suspended({
                         ))}
                      </div>
                      <Pagination
-                        page={upcomingPage}
+                        page={upcomingPageParams}
                         total={upcomingTotal}
                         param="upcomingPage"
                         pageSize={reservationsPageSize}

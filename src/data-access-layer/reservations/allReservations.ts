@@ -4,6 +4,7 @@ import { parsePhilippineDate } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { addDays } from "date-fns";
+import { ReservationWhereInput } from "@/generated/prisma/models";
 
 export async function getAllReservations({
    upcomingPage,
@@ -20,7 +21,11 @@ export async function getAllReservations({
 
    const now = new Date();
    const filters = getReservationFilters(roomId, date);
-   const where = { endTime: { gt: now }, ...filters };
+   const where: ReservationWhereInput = {
+      endTime: { gt: now },
+      checkedOutAt: null,
+      ...filters,
+   };
    const [upcoming, upcomingTotal] = await Promise.all([
       prisma.reservation.findMany({
          where,
@@ -48,8 +53,9 @@ export async function getCompletedReservations({
 }) {
    await restrictReservationAccess();
 
-   const where = {
-      endTime: { lte: new Date() },
+   const now = new Date();
+   const where: ReservationWhereInput = {
+      OR: [{ endTime: { lte: now } }, { NOT: { checkedOutAt: null } }],
       NOT: { checkedInAt: null },
       ...getReservationFilters(roomId, date),
    };

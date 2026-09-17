@@ -3,7 +3,7 @@ import {
    pastReservationsPage,
    reservationsPageSize,
 } from "@/constants";
-import { getPastReservations } from "@/data-access-layer/reservations/myReservations";
+import { getMyCompletedReservations } from "@/data-access-layer/reservations/myReservations";
 import getRooms from "@/data-access-layer/room/rooms";
 import ReservationFilters, {
    formatFilterDate,
@@ -33,7 +33,7 @@ async function Suspended({
    const roomId = params.roomId || undefined;
    const date = formatFilterDate(params.date);
    const [{ past, pastTotal }, rooms] = await Promise.all([
-      getPastReservations({
+      getMyCompletedReservations({
          page,
          pageSize: reservationsPageSize,
          roomId,
