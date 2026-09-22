@@ -1,7 +1,6 @@
 "use client";
 
 import {
-   historyPage,
    // homePage,
    notificationsPage,
    myReservationsPage,
@@ -48,7 +47,6 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    STUDENT: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
-      { icon: Scroll, label: "History", link: historyPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
       { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],

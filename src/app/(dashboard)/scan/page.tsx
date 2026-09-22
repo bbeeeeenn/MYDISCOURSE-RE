@@ -1,7 +1,7 @@
 "use client";
 
 import { Scanner } from "@yudiel/react-qr-scanner";
-import { AlertCircle, Camera, CheckCircle2, ScanLine } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -59,6 +59,8 @@ export default function ScanPage() {
               <Scanner
                 onScan={handleScan}
                 onError={() => setStatus("error")}
+                allowMultiple
+                scanDelay={1000}
                 formats={["qr_code"]}
                 constraints={{ facingMode: "environment" }}
                 sound

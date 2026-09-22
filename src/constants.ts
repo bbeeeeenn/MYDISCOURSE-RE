@@ -8,7 +8,6 @@ export const homePage = "/home";
 export const myReservationsPage = "/my-reservations";
 export const pastReservationsPage = "/my-reservations/past";
 export const reservationsPageSize = 5;
-export const historyPage = "/history";
 export const notificationsPage = "/notifications";
 export const logsPage = "/logs";
 export const scanPage = "/scan";
