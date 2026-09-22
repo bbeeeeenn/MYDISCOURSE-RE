@@ -13,6 +13,7 @@
         "@auth/prisma-adapter": "^2.11.3",
         "@prisma/adapter-pg": "^7.10.0",
         "@prisma/client": "^7.10.0",
+        "@yudiel/react-qr-scanner": "^2.6.0",
         "bcryptjs": "^3.0.3",
         "cloudinary": "^2.11.0",
         "clsx": "^2.1.1",
