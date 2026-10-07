@@ -14,7 +14,7 @@ type AdminReservation = {
    id: string;
    startTime: Date;
    endTime: Date;
-   occupants: number;
+   occupants: string[];
    purpose: string;
    checkedInAt: Date | null;
    checkedOutAt: Date | null;
@@ -83,7 +83,7 @@ export default function AdminReservationCard({
             <p className="flex items-center gap-2">
                <UsersRound className="text-secondary" size={18} />
                {reservation.occupants}{" "}
-               {reservation.occupants === 1 ? "person" : "people"}
+               {reservation.occupants.length === 1 ? "person" : "people"}
             </p>
          </div>
 

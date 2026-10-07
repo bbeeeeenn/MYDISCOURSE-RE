@@ -35,7 +35,7 @@ model Reservation {
   reservationDate DateTime @default(now())
   startTime DateTime
   endTime DateTime
-  occupants String[] // Array of student id number
+  occupants String[]
   purpose String @db.Text
   checkedInAt DateTime?
   checkedOutAt DateTime?

@@ -142,7 +142,9 @@ async function Suspended({
                         <p className="font-semibold text-gray-900">Occupants</p>
                         <p>
                            {reservation.occupants}{" "}
-                           {reservation.occupants === 1 ? "person" : "people"}
+                           {reservation.occupants.length === 1
+                              ? "person"
+                              : "people"}
                         </p>
                      </div>
                   </div>

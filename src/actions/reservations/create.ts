@@ -132,7 +132,7 @@ export default async function createReservation(
             userId,
             startTime: start,
             endTime: end,
-            occupants,
+            occupants: [occupants.toString()], // To Do
             purpose,
          },
       });

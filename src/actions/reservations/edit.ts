@@ -110,7 +110,12 @@ export default async function editReservation(
 
       await prisma.reservation.update({
          where: { id },
-         data: { startTime: start, endTime: end, occupants, purpose },
+         data: {
+            startTime: start,
+            endTime: end,
+            occupants: [occupants.toString()], // To Do
+            purpose,
+         },
       });
       revalidatePath(myReservationsPage);
 

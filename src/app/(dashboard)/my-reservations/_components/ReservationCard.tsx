@@ -17,7 +17,7 @@ export type Reservation = {
    id: string;
    startTime: Date;
    endTime: Date;
-   occupants: number;
+   occupants: string[];
    purpose: string;
    checkedInAt: Date | null;
    room: { room_name: string; location: string; capacity: number; id: string };
@@ -86,7 +86,7 @@ export default function ReservationCard({
             <p className="flex items-center gap-2">
                <UsersRound className="text-secondary" size={18} />
                {reservation.occupants}{" "}
-               {reservation.occupants === 1 ? "person" : "people"}
+               {reservation.occupants.length === 1 ? "person" : "people"}
             </p>
          </div>
 

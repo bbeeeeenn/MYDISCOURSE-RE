@@ -32,7 +32,7 @@ export default function EditReservationButton({
    date: string;
    startTime: string;
    endTime: string;
-   occupants: number;
+   occupants: string[];
    purpose: string;
 }) {
    const dialogRef = useRef<HTMLDialogElement>(null);
