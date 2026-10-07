@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -12,10 +7,81 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Appliances {
+  TV
+  Projector
+  Fan
+}
+
+model Room {
+  id String @id @default(cuid())
+  room_name String @unique
+  location String
+  capacity Int
+  createdAt DateTime @default(now())
+  image_url String?
+  image_public_id String?
+  available_appliances Appliances[]
+
+  reservations Reservation[]
+
+  @@map("rooms")
+}
+
+model Reservation {
+  id String @id @default(cuid())
+  roomId String
+  userId String // Reservation Creator
+  reservationDate DateTime @default(now())
+  startTime DateTime
+  endTime DateTime
+  occupants String[] // Array of student id number
+  purpose String @db.Text
+  checkedInAt DateTime?
+  checkedOutAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
+
+  @@index([roomId, reservationDate])
+  @@map("reservations")
+}
+
+model StudentRecord {
+  id_number String @id
+  firstname String
+  middlename String?
+  lastname String
+  yearlevel Int
+  college String
+  program String
+}
+
 enum Role {
   ADMIN
   STUDENT
   STAFF
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  name          String?
+  id_number     String?    @unique
+  year_level    Int?
+  course        String?
+  password      String?
+  role          Role      @default(STUDENT)
+
+  reservations Reservation[]
+
+  @@index([role])
+  @@map("users")
 }
 
 model Account {
@@ -47,27 +113,6 @@ model Session {
   @@map("sessions")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-
-  name          String?
-  id_number     String?    @unique
-  year_level    Int?
-  course        String?
-  password      String?
-  role          Role      @default(STUDENT)
-
-  reservations Reservation[]
-
-  @@index([role])
-  @@map("users")
-}
-
 model VerificationToken {
   identifier String
   token      String
@@ -75,37 +120,4 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
-}
-
-model Room {
-  id String @id @default(cuid())
-  room_name String @unique
-  location String
-  capacity Int
-  createdAt DateTime @default(now())
-  image_url String?
-  image_public_id String?
-
-  reservations Reservation[]
-
-  @@map("rooms")
-}
-
-model Reservation {
-  id String @id @default(cuid())
-  roomId String
-  userId String
-  reservationDate DateTime @default(now())
-  startTime DateTime
-  endTime DateTime
-  occupants Int
-  purpose String @db.Text
-  checkedInAt DateTime?
-  checkedOutAt DateTime?
-
-  user User @relation(fields: [userId], references: [id])
-  room Room @relation(fields: [roomId], references: [id])
-
-  @@index([roomId, reservationDate])
-  @@map("reservations")
 }
