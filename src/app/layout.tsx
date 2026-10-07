@@ -4,6 +4,7 @@ import AuthSessionProvider from "@/components/AuthSessionProvider";
 import clsx from "clsx";
 import { ToastContainer } from "react-toastify";
 import { Outfit } from "next/font/google";
+import React from "react";
 
 const outfitFont = Outfit({
    variable: "--font-outfit",

@@ -3,10 +3,14 @@ import { Suspense } from "react";
 
 export default function Layout({
    children,
-}: Readonly<{ children: React.ReactNode }>) {
+   login,
+}: Readonly<{ children: React.ReactNode; login: React.ReactNode }>) {
    return (
       <Suspense>
-         <SidebarProvider>{children}</SidebarProvider>
+         <SidebarProvider>
+            {login}
+            {children}
+         </SidebarProvider>
       </Suspense>
    );
 }

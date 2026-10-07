@@ -3,7 +3,7 @@
 import { Dialog, toggleDialog } from "@/components/ui/Dialog";
 import { RoomModel } from "@/generated/prisma/models";
 import createReservation from "@/actions/reservations/create";
-import { profilePage } from "@/constants";
+import { profilePage, signInPage } from "@/constants";
 import { getPhilippineToday, parsePhilippineDateTime } from "@/lib/date";
 import clsx from "clsx";
 import {
@@ -18,6 +18,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SubmitEvent, useActionState, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function CreateReservation({
    room,
@@ -26,21 +27,34 @@ export default function CreateReservation({
    room: RoomModel;
    dateParam?: string;
 }) {
+   const session = useSession();
    const pathname = usePathname();
    const searchParams = useSearchParams();
    const dialogRef = useRef<HTMLDialogElement>(null);
 
    return (
       <>
-         <button
-            onClick={() => toggleDialog(dialogRef, true)}
-            className="bg-base-200 text-base-100 flex w-fit items-center gap-1 rounded-md px-6 py-2 font-medium tracking-wide"
-         >
-            <span>
-               <Plus />
-            </span>
-            Create Reservation
-         </button>
+         {session.status === "authenticated" ? (
+            <button
+               onClick={() => toggleDialog(dialogRef, true)}
+               className="bg-base-200 text-base-100 flex w-fit items-center gap-1 rounded-md px-6 py-2 font-medium tracking-wide"
+            >
+               <span>
+                  <Plus />
+               </span>
+               Create Reservation
+            </button>
+         ) : (
+            <Link
+               href={signInPage}
+               className="bg-base-200 text-base-100 flex w-fit items-center gap-1 rounded-md px-6 py-2 font-medium tracking-wide"
+            >
+               <span>
+                  <Plus />
+               </span>
+               Create Reservation
+            </Link>
+         )}
 
          <Dialog
             key={pathname + searchParams.toString()}

@@ -1,12 +1,13 @@
 "use client";
 
+import { roomsPage } from "@/constants";
 import { signOut } from "next-auth/react";
 
 export default function SignOutButton() {
    return (
       <button
          type="button"
-         onClick={() => signOut({ callbackUrl: "/signin" })}
+         onClick={() => signOut({ callbackUrl: roomsPage })}
          className="text-base-100 absolute inset-x-0 bottom-0 bg-red-600 py-2 text-xl font-medium"
       >
          Sign out

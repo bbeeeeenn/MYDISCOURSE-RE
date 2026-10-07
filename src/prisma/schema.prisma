@@ -76,7 +76,7 @@ model User {
   year_level    Int?
   course        String?
   password      String?
-  role          Role      @default(STUDENT)
+  role          Role      @default(ADMIN) // Temporary
 
   reservations Reservation[]
 
