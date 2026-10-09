@@ -257,7 +257,7 @@ function ReservationGroup({
                      </div>
                      <p className="flex items-center gap-1.5 text-sm text-gray-600">
                         <UsersRound size={16} />
-                        {reservation.occupants}{" "}
+                        {reservation.occupants.length}{" "}
                         {reservation.occupants.length === 1
                            ? "person"
                            : "people"}
