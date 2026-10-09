@@ -1,0 +1,142 @@
+import prisma from "@/lib/prisma";
+
+async function main() {
+   await prisma.studentRecord.createMany({
+      data: [
+         {
+            id_number: "241-00001",
+            firstname: "Juan",
+            lastname: "Dela Cruz",
+            college: "CCIS",
+            program: "Computer Science",
+            yearlevel: 2,
+         },
+         {
+            id_number: "241-00002",
+            firstname: "Maria",
+            middlename: "Santos",
+            lastname: "Reyes",
+            college: "CCIS",
+            program: "Information Technology",
+            yearlevel: 1,
+         },
+         {
+            id_number: "241-00003",
+            firstname: "Carlos",
+            middlename: "Miguel",
+            lastname: "Garcia",
+            college: "CCIS",
+            program: "Computer Science",
+            yearlevel: 3,
+         },
+         {
+            id_number: "241-00004",
+            firstname: "Angela",
+            lastname: "Mendoza",
+            college: "CCIS",
+            program: "Information Systems",
+            yearlevel: 4,
+         },
+         {
+            id_number: "241-00005",
+            firstname: "Paolo",
+            middlename: "Ramos",
+            lastname: "Navarro",
+            college: "CEA",
+            program: "Civil Engineering",
+            yearlevel: 2,
+         },
+         {
+            id_number: "241-00006",
+            firstname: "Sofia",
+            lastname: "Bautista",
+            college: "CEA",
+            program: "Electrical Engineering",
+            yearlevel: 1,
+         },
+         {
+            id_number: "241-00007",
+            firstname: "Daniel",
+            middlename: "Cruz",
+            lastname: "Villanueva",
+            college: "CBA",
+            program: "Accountancy",
+            yearlevel: 3,
+         },
+         {
+            id_number: "241-00008",
+            firstname: "Beatriz",
+            lastname: "Fernandez",
+            college: "CBA",
+            program: "Business Administration",
+            yearlevel: 4,
+         },
+         {
+            id_number: "241-00009",
+            firstname: "Miguel",
+            middlename: "Jose",
+            lastname: "Aquino",
+            college: "CAS",
+            program: "Psychology",
+            yearlevel: 2,
+         },
+         {
+            id_number: "241-00010",
+            firstname: "Isabella",
+            lastname: "Dizon",
+            college: "CAS",
+            program: "Communication",
+            yearlevel: 1,
+         },
+         {
+            id_number: "241-00011",
+            firstname: "Nathan",
+            middlename: "Lee",
+            lastname: "Torres",
+            college: "CCIS",
+            program: "Data Science",
+            yearlevel: 4,
+         },
+         {
+            id_number: "241-00012",
+            firstname: "Camille",
+            lastname: "Santiago",
+            college: "CCIS",
+            program: "Computer Science",
+            yearlevel: 1,
+         },
+         {
+            id_number: "241-00013",
+            firstname: "Andres",
+            middlename: "Martin",
+            lastname: "Lim",
+            college: "CIT",
+            program: "Industrial Technology",
+            yearlevel: 3,
+         },
+         {
+            id_number: "241-00014",
+            firstname: "Hannah",
+            lastname: "Mercado",
+            college: "CIT",
+            program: "Food Technology",
+            yearlevel: 2,
+         },
+         {
+            id_number: "241-00015",
+            firstname: "Rafael",
+            middlename: "Santos",
+            lastname: "Castillo",
+            college: "COED",
+            program: "Elementary Education",
+            yearlevel: 4,
+         },
+      ],
+      skipDuplicates: true,
+   });
+}
+
+main().catch((e) => {
+   console.error(e);
+   process.exit(1);
+});
