@@ -26,9 +26,6 @@ async function Suspended() {
       select: {
          name: true,
          email: true,
-         id_number: true,
-         year_level: true,
-         course: true,
          role: true,
       },
    });
@@ -43,25 +40,17 @@ function ProfileFallback() {
          aria-busy="true"
       >
          <div>
-            <div className="h-8 w-28 rounded bg-gray-200" />
+            <div className="h-8 w-24 rounded bg-gray-200" />
             <div className="mt-2 h-4 w-72 max-w-full rounded bg-gray-200" />
          </div>
-         {["name", "email", "id-number"].map((field) => (
+         {["name", "email"].map((field) => (
             <div key={field} className="grid gap-2">
                <div className="h-4 w-20 rounded bg-gray-200" />
                <div className="h-11 w-full rounded bg-gray-200" />
             </div>
          ))}
-         <div className="grid gap-4 sm:grid-cols-2">
-            {["year-level", "course"].map((field) => (
-               <div key={field} className="grid gap-2">
-                  <div className="h-4 w-24 rounded bg-gray-200" />
-                  <div className="h-11 w-full rounded bg-gray-200" />
-               </div>
-            ))}
-         </div>
          <div className="h-4 w-32 rounded bg-gray-200" />
-         <div className="h-11 w-full rounded bg-gray-200" />
+         <div className="h-10 w-full rounded-md bg-gray-200" />
       </div>
    );
 }

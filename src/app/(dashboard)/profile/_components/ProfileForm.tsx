@@ -9,9 +9,6 @@ import { toast } from "react-toastify";
 type Profile = {
    name: string | null;
    email: string | null;
-   id_number: string | null;
-   year_level: number | null;
-   course: string | null;
    role: "ADMIN" | "STAFF" | "STUDENT";
 };
 
@@ -68,45 +65,6 @@ export default function ProfileForm({ user }: { user: Profile }) {
                className="rounded-sm border-2 border-gray-300 bg-gray-100 p-2 text-lg"
             />
          </label>
-         <label className="grid gap-1 text-gray-700" htmlFor="id-number">
-            ID number
-            <input
-               id="id-number"
-               name="idNumber"
-               type="text"
-               defaultValue={user.id_number ?? ""}
-               spellCheck={false}
-               autoComplete="off"
-               className="rounded-sm border-2 border-gray-500 p-2 text-lg"
-            />
-         </label>
-         {user.role === "STUDENT" && (
-            <div className="grid gap-4 sm:grid-cols-2">
-               <label className="grid gap-1 text-gray-700" htmlFor="year-level">
-                  Year level
-                  <input
-                     id="year-level"
-                     name="yearLevel"
-                     type="number"
-                     spellCheck={false}
-                     min={1}
-                     defaultValue={user.year_level ?? ""}
-                     className="rounded-sm border-2 border-gray-500 p-2 text-lg"
-                  />
-               </label>
-               <label className="grid gap-1 text-gray-700" htmlFor="course">
-                  Course
-                  <input
-                     id="course"
-                     name="course"
-                     spellCheck={false}
-                     type="text"
-                     defaultValue={user.course ?? ""}
-                     className="rounded-sm border-2 border-gray-500 p-2 text-lg"
-                  />
-               </label>
-            </div>
-         )}
          <p className="text-sm text-gray-600">Account role: {user.role}</p>
          {state && !state.ok && (
             <p className="text-sm text-red-700" role="alert">
