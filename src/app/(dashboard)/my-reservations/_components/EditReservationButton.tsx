@@ -10,11 +10,13 @@ import {
    FileText,
    LoaderCircle,
    Pen,
+   Trash2,
    UsersRound,
 } from "lucide-react";
 import { useRef, useState, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { IdNumberInput } from "@/components/ui/IdNumberInput";
 
 export default function EditReservationButton({
    reservationId,
@@ -23,7 +25,7 @@ export default function EditReservationButton({
    date,
    startTime,
    endTime,
-   occupants,
+   occupants: _occupants,
    purpose,
 }: {
    reservationId: string;
@@ -37,9 +39,23 @@ export default function EditReservationButton({
 }) {
    const dialogRef = useRef<HTMLDialogElement>(null);
    const router = useRouter();
+
+   const [occupants, setOccupants] = useState<Set<string>>(new Set(_occupants));
    const [state, formAction, isPending] = useActionState(
       async (_previousState: unknown, formData: FormData) => {
-         const result = await editReservation(reservationId, formData);
+         const scheduledDate = String(formData.get("scheduledDate") || "");
+         const startTime = String(formData.get("startTime") || "");
+         const endTime = String(formData.get("endTime") || "");
+         const purpose = String(formData.get("purpose") || "").trim();
+
+         const result = await editReservation(
+            reservationId,
+            scheduledDate,
+            startTime,
+            endTime,
+            purpose,
+            [...occupants],
+         );
          toast(result.ok ? result.data.message : result.message, {
             type: result.ok ? "success" : "error",
             position: "bottom-right",
@@ -74,7 +90,7 @@ export default function EditReservationButton({
             onClose={() => toggleDialog(dialogRef, false)}
          >
             <form action={formAction} className="flex min-w-75 flex-col">
-               <div className="grid max-h-110 gap-5 overflow-y-auto px-4 py-5 sm:px-6">
+               <div className="grid max-h-100 gap-5 overflow-y-auto px-4 py-5 sm:px-6">
                   <div className="mb-2 space-y-2">
                      <p className="text-base-400 text-xl font-bold">
                         {roomName}
@@ -152,21 +168,58 @@ export default function EditReservationButton({
                      </legend>
                      <label
                         className="grid gap-1.5 text-sm font-medium text-gray-700"
-                        htmlFor={`${reservationId}-occupants`}
+                        htmlFor="occupants"
                      >
                         <span className="flex items-center gap-1.5">
-                           <UsersRound size={16} /> Occupants
+                           <UsersRound size={16} /> Occupants:
+                           <span
+                              className={clsx(
+                                 occupants.size >= capacity && "text-red-500",
+                              )}
+                           >
+                              {occupants.size}/{capacity}{" "}
+                              {occupants.size >= capacity && "(Full)"}
+                           </span>
                         </span>
-                        <input
-                           id={`${reservationId}-occupants`}
-                           name="occupants"
-                           type="number"
-                           min={1}
-                           max={capacity}
-                           defaultValue={occupants}
-                           required
-                           className="rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
-                        />
+                        <div className="my-2">
+                           <div className="mb-1 flex flex-wrap items-center gap-1">
+                              {[...occupants].map((occupant) => (
+                                 <div
+                                    key={occupant}
+                                    className="flex w-fit items-center gap-2 rounded-sm border border-gray-300 bg-white px-2 py-1"
+                                 >
+                                    <span>{occupant}</span>
+                                    <button
+                                       type="button"
+                                       onClick={() =>
+                                          setOccupants((prev) => {
+                                             const newSet = new Set(prev);
+                                             newSet.delete(occupant);
+                                             return newSet;
+                                          })
+                                       }
+                                    >
+                                       <Trash2
+                                          size={15}
+                                          className="text-red-500"
+                                       />
+                                    </button>
+                                 </div>
+                              ))}
+                           </div>
+                        </div>
+                        <p className="flex items-center gap-1 text-xs font-light">
+                           Student ID Number
+                        </p>
+                        {occupants.size < capacity && (
+                           <IdNumberInput
+                              callback={(input) => {
+                                 setOccupants((prev) =>
+                                    new Set(prev).add(input),
+                                 );
+                              }}
+                           />
+                        )}
                      </label>
                      <label
                         className="grid gap-1.5 text-sm font-medium text-gray-700"

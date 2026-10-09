@@ -71,7 +71,6 @@ async function Suspended({
                name: true,
                email: true,
                role: true,
-               id_number: true,
             },
          },
       },
@@ -140,12 +139,9 @@ async function Suspended({
                      <UsersRound className="text-secondary mt-0.5" size={18} />
                      <div>
                         <p className="font-semibold text-gray-900">Occupants</p>
-                        <p>
-                           {reservation.occupants}{" "}
-                           {reservation.occupants.length === 1
-                              ? "person"
-                              : "people"}
-                        </p>
+                        {reservation.occupants.map((idnumber) => (
+                           <p key={idnumber}>{idnumber}</p>
+                        ))}
                      </div>
                   </div>
 
@@ -192,14 +188,6 @@ async function Suspended({
                         </span>{" "}
                         {reservation.user.role}
                      </p>
-                     {
-                        <p>
-                           <span className="font-semibold text-gray-900">
-                              Student ID:
-                           </span>{" "}
-                           {reservation.user.id_number ?? "Not provided"}
-                        </p>
-                     }
                   </div>
                </div>
 

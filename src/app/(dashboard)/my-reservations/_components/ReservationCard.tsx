@@ -85,7 +85,7 @@ export default function ReservationCard({
             </p>
             <p className="flex items-center gap-2">
                <UsersRound className="text-secondary" size={18} />
-               {reservation.occupants}{" "}
+               {reservation.occupants.length}{" "}
                {reservation.occupants.length === 1 ? "person" : "people"}
             </p>
          </div>

@@ -7,43 +7,17 @@ import { addMinutes } from "date-fns";
 
 export default async function createReservation(
    roomId: string,
-   formData: FormData,
+   scheduledDate: string,
+   startTime: string,
+   endTime: string,
+   purpose: string,
+   occupants: string[],
 ): ActionResult<{ message: string }> {
    const session = await auth();
    const userId = session?.user.id;
    if (!userId) return { ok: false, error: "AUTH", message: "Please sign in" };
 
    try {
-      const user = await prisma.user.findUnique({
-         where: { id: userId },
-         select: {
-            name: true,
-            id_number: true,
-            year_level: true,
-            course: true,
-            role: true,
-         },
-      });
-      if (
-         !user ||
-         !user.name?.trim() ||
-         !user.id_number?.trim() ||
-         (user.role === "STUDENT" &&
-            (!user.course?.trim() || user.year_level === null))
-      ) {
-         return {
-            ok: false,
-            error: "VALIDATION",
-            message: "Complete your profile before creating a reservation",
-         };
-      }
-
-      const scheduledDate = String(formData.get("scheduledDate") || "");
-      const startTime = String(formData.get("startTime") || "");
-      const endTime = String(formData.get("endTime") || "");
-      const purpose = String(formData.get("purpose") || "").trim();
-      const occupants = Number(formData.get("occupants"));
-
       if (
          !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate) ||
          !startTime ||
@@ -80,7 +54,7 @@ export default async function createReservation(
             message: "End time must be later than start time",
          };
       }
-      if (!Number.isInteger(occupants) || occupants < 1 || !purpose) {
+      if (occupants.length === 0 || !purpose) {
          return {
             ok: false,
             error: "VALIDATION",
@@ -91,7 +65,7 @@ export default async function createReservation(
       const room = await prisma.room.findUnique({ where: { id: roomId } });
       if (!room)
          return { ok: false, error: "NOT_FOUND", message: "Room not found" };
-      if (occupants > room.capacity) {
+      if (occupants.length > room.capacity) {
          return {
             ok: false,
             error: "VALIDATION",
@@ -107,6 +81,13 @@ export default async function createReservation(
             ok: false,
             error: "VALIDATION",
             message: "The reservation time window has already passed",
+         };
+      }
+      if ((end.getTime() - start.getTime()) / 1000 / 60 / 60 > 2) {
+         return {
+            ok: false,
+            error: "VALIDATION",
+            message: "Reservation duration cannot exceed 2 hours",
          };
       }
 
@@ -132,7 +113,7 @@ export default async function createReservation(
             userId,
             startTime: start,
             endTime: end,
-            occupants: [occupants.toString()], // To Do
+            occupants,
             purpose,
          },
       });

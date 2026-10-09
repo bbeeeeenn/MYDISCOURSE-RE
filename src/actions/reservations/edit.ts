@@ -8,18 +8,17 @@ import { revalidatePath } from "next/cache";
 
 export default async function editReservation(
    reservationId: string,
-   formData: FormData,
+   scheduledDate: string,
+   startTime: string,
+   endTime: string,
+   purpose: string,
+   occupants: string[],
 ): ActionResult<{ message: string }> {
    const session = await auth();
    const userId = session?.user.id;
    if (!userId) return { ok: false, error: "AUTH", message: "Please sign in" };
 
    const id = reservationId.trim();
-   const scheduledDate = String(formData.get("scheduledDate") || "");
-   const startTime = String(formData.get("startTime") || "");
-   const endTime = String(formData.get("endTime") || "");
-   const purpose = String(formData.get("purpose") || "").trim();
-   const occupants = Number(formData.get("occupants"));
 
    if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(scheduledDate)) {
       return { ok: false, error: "VALIDATION", message: "Date is required" };
@@ -47,7 +46,7 @@ export default async function editReservation(
          message: "Reservations are available from 8:00 AM to 6:00 PM",
       };
    }
-   if (!Number.isInteger(occupants) || occupants < 1 || !purpose) {
+   if (occupants.length < 1 || !purpose) {
       return {
          ok: false,
          error: "VALIDATION",
@@ -57,10 +56,10 @@ export default async function editReservation(
 
    try {
       const reservation = await prisma.reservation.findUnique({
-         where: { id },
+         where: { id, userId },
          include: { room: { select: { capacity: true } } },
       });
-      if (!reservation || reservation.userId !== userId) {
+      if (!reservation) {
          return {
             ok: false,
             error: "NOT_FOUND",
@@ -74,7 +73,7 @@ export default async function editReservation(
             message: "Only upcoming reservations can be edited",
          };
       }
-      if (occupants > reservation.room.capacity) {
+      if (occupants.length > reservation.room.capacity) {
          return {
             ok: false,
             error: "VALIDATION",
@@ -89,6 +88,13 @@ export default async function editReservation(
             ok: false,
             error: "VALIDATION",
             message: "Reservation must start in the future",
+         };
+      }
+      if ((end.getTime() - start.getTime()) / 1000 / 60 / 60 > 2) {
+         return {
+            ok: false,
+            error: "VALIDATION",
+            message: "Reservation duration cannot exceed 2 hours",
          };
       }
 
@@ -113,7 +119,7 @@ export default async function editReservation(
          data: {
             startTime: start,
             endTime: end,
-            occupants: [occupants.toString()], // To Do
+            occupants,
             purpose,
          },
       });

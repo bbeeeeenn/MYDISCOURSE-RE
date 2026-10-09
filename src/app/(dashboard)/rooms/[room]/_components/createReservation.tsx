@@ -12,6 +12,7 @@ import {
    FileText,
    LoaderCircle,
    Plus,
+   Trash2,
    UsersRound,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -19,6 +20,7 @@ import { SubmitEvent, useActionState, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { IdNumberInput } from "@/components/ui/IdNumberInput";
 
 export default function CreateReservation({
    room,
@@ -47,7 +49,11 @@ export default function CreateReservation({
          ) : (
             <Link
                href={signInPage}
-               className="bg-base-200 text-base-100 flex w-fit items-center gap-1 rounded-md px-6 py-2 font-medium tracking-wide"
+
+               className={clsx(
+                  "bg-base-200 text-base-100 flex w-fit items-center gap-1 rounded-md px-6 py-2 font-medium tracking-wide",
+                  session.status === "loading" && "pointer-events-none",
+               )}
             >
                <span>
                   <Plus />
@@ -84,9 +90,22 @@ function ReservationForm({
    const today = getPhilippineToday();
    const selectedDate = dateParam && dateParam >= today ? dateParam : today;
    const router = useRouter();
+
+   const [occupants, setOccupants] = useState<Set<string>>(new Set([]));
    const [state, formAction, isPending] = useActionState(
       async (_previousState: unknown, formData: FormData) => {
-         const result = await createReservation(room.id, formData);
+         const scheduledDate = String(formData.get("scheduledDate") || "");
+         const startTime = String(formData.get("startTime") || "");
+         const endTime = String(formData.get("endTime") || "");
+         const purpose = String(formData.get("purpose") || "").trim();
+         const result = await createReservation(
+            room.id,
+            scheduledDate,
+            startTime,
+            endTime,
+            purpose,
+            [...occupants],
+         );
          toast(result.ok ? result.data.message : result.message, {
             type: result.ok ? "success" : "error",
             position: "bottom-right",
@@ -109,7 +128,7 @@ function ReservationForm({
    const [acceptedTermsAndConditions, setAcceptedTermsAndConditions] =
       useState(false);
 
-   const preventWhilePending = (event: SubmitEvent<HTMLFormElement>) => {
+   const validateClientside = (event: SubmitEvent<HTMLFormElement>) => {
       const date = event.currentTarget.elements.namedItem(
          "scheduledDate",
       ) as HTMLInputElement;
@@ -122,7 +141,8 @@ function ReservationForm({
       const selectedDate = date.value
          ? new Date(`${date.value}T00:00:00`)
          : null;
-      const isWeekday = selectedDate !== null && selectedDate.getDay() !== 0;
+      const isAvailableDayOfWeek =
+         selectedDate !== null && selectedDate.getDay() !== 0;
       const start =
          date.value && startTime.value
             ? parsePhilippineDateTime(date.value, startTime.value)
@@ -143,7 +163,7 @@ function ReservationForm({
          startTime.value < endTime.value;
 
       date.setCustomValidity(
-         !isWeekday
+         !isAvailableDayOfWeek
             ? "Reservations are available Monday through Saturday"
             : !isWithinBookingWindow
               ? "The reservation time window has already passed"
@@ -159,7 +179,7 @@ function ReservationForm({
       if (
          isPending ||
          !acceptedTermsAndConditions ||
-         !isWeekday ||
+         !isAvailableDayOfWeek ||
          !isWithinBookingWindow ||
          !validHours
       )
@@ -169,10 +189,10 @@ function ReservationForm({
    return (
       <form
          action={formAction}
-         onSubmit={preventWhilePending}
+         onSubmit={validateClientside}
          className="flex min-w-75 flex-col"
       >
-         <div className="grid max-h-110 gap-5 overflow-y-auto px-4 py-5 sm:px-6">
+         <div className="grid max-h-100 gap-5 overflow-y-auto px-4 pt-5 pb-10 sm:px-6">
             <div className="mb-2 space-y-2">
                <p className="text-base-400 text-xl font-bold">
                   {room.room_name}
@@ -191,7 +211,7 @@ function ReservationForm({
                   className="grid gap-1.5 text-sm font-medium text-gray-700"
                   htmlFor="reservation-date"
                >
-                  Date
+                  <p>Date</p>
                   <input
                      id="reservation-date"
                      name="scheduledDate"
@@ -207,7 +227,7 @@ function ReservationForm({
                      className="grid gap-1.5 text-sm font-medium text-gray-700"
                      htmlFor="start-time"
                   >
-                     Start time
+                     <p>Start time</p>
                      <input
                         id="start-time"
                         name="startTime"
@@ -222,7 +242,7 @@ function ReservationForm({
                      className="grid gap-1.5 text-sm font-medium text-gray-700"
                      htmlFor="end-time"
                   >
-                     End time
+                     <p>End time</p>
                      <input
                         id="end-time"
                         name="endTime"
@@ -250,24 +270,56 @@ function ReservationForm({
                   htmlFor="occupants"
                >
                   <span className="flex items-center gap-1.5">
-                     <UsersRound size={16} /> Occupants
+                     <UsersRound size={16} /> Occupants:
+                     <span
+                        className={clsx(
+                           occupants.size >= room.capacity && "text-red-500",
+                        )}
+                     >
+                        {occupants.size}/{room.capacity}{" "}
+                        {occupants.size >= room.capacity && "(Full)"}
+                     </span>
                   </span>
-                  <input
-                     id="occupants"
-                     name="occupants"
-                     type="number"
-                     min={1}
-                     max={room.capacity}
-                     defaultValue={1}
-                     required
-                     className="rounded-md border border-gray-300 bg-white px-3 py-2.5 text-base shadow-sm"
-                  />
+                  <div className="my-2">
+                     <div className="mb-1 flex flex-wrap items-center gap-1">
+                        {[...occupants].map((occupant) => (
+                           <div
+                              key={occupant}
+                              className="flex w-fit items-center gap-2 rounded-sm border border-gray-300 bg-white px-2 py-1"
+                           >
+                              <span>{occupant}</span>
+                              <button
+                                 type="button"
+                                 onClick={() =>
+                                    setOccupants((prev) => {
+                                       const newSet = new Set(prev);
+                                       newSet.delete(occupant);
+                                       return newSet;
+                                    })
+                                 }
+                              >
+                                 <Trash2 size={15} className="text-red-500" />
+                              </button>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+                  <p className="flex items-center gap-1 text-xs font-light">
+                     Student ID Number
+                  </p>
+                  {occupants.size < room.capacity && (
+                     <IdNumberInput
+                        callback={(input) => {
+                           setOccupants((prev) => new Set(prev).add(input));
+                        }}
+                     />
+                  )}
                </label>
                <label
                   className="grid gap-1.5 text-sm font-medium text-gray-700"
                   htmlFor="purpose"
                >
-                  Purpose
+                  <p>Purpose</p>
                   <textarea
                      id="purpose"
                      name="purpose"
@@ -296,7 +348,7 @@ function ReservationForm({
                   }
                   className="accent-base-300 mt-1.5"
                />
-               <label htmlFor="tc" className="text-justify">
+               <label htmlFor="tc" className="text-justify text-sm">
                   I agree to the{" "}
                   <Link href={""} className="text-blue-400 underline">
                      terms and conditions
@@ -308,11 +360,10 @@ function ReservationForm({
             </div>
             <button
                type="submit"
-               inert={isPending || !acceptedTermsAndConditions}
                disabled={isPending || !acceptedTermsAndConditions}
                className={clsx(
                   "bg-base-300 text-base-100 mt-1 flex items-center justify-center gap-2 rounded-md py-3 text-base font-bold shadow-sm transition hover:brightness-110",
-                  (isPending || !acceptedTermsAndConditions) && "opacity-50",
+                  "disabled:cursor-not-allowed! disabled:opacity-50",
                )}
             >
                {isPending && <LoaderCircle className="animate-spin" />}
