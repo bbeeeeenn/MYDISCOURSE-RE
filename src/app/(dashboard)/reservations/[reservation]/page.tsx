@@ -5,11 +5,18 @@ import Back from "@/components/ui/Back";
 import { auth } from "@/lib/auth";
 import { formatPhilippineTime, getPhilippineDateTimeInputs } from "@/lib/date";
 import prisma from "@/lib/prisma";
-import { CalendarDays, Clock3, MapPin, UsersRound } from "lucide-react";
+import {
+   CalendarDays,
+   Clock3,
+   MapPin,
+   UserRound,
+   UsersRound,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { Suspense } from "react";
+import { StudentRecord } from "@/generated/prisma/client";
 
 function getReservationStatusText({
    now,
@@ -80,6 +87,18 @@ async function Suspended({
       redirect(reservationsPage);
    }
 
+   const occupantsInfo = await prisma.studentRecord.findMany({
+      where: { id_number: { in: reservation.occupants } },
+   });
+
+   const occupantsMap: Map<string, StudentRecord | null> = new Map();
+   for (const occupant of reservation.occupants) {
+      occupantsMap.set(occupant, null);
+   }
+   for (const info of occupantsInfo) {
+      occupantsMap.set(info.id_number, info);
+   }
+
    const now = new Date();
    const isCompleted = !!reservation.checkedOutAt || reservation.endTime < now;
    const canCheckIn =
@@ -136,31 +155,137 @@ async function Suspended({
 
                <div className="mt-5 space-y-4 text-sm text-gray-700">
                   <div className="flex items-start gap-2">
-                     <UsersRound className="text-secondary mt-0.5" size={18} />
-                     <div>
-                        <p className="font-semibold text-gray-900">Occupants</p>
-                        {reservation.occupants.map((idnumber) => (
-                           <p key={idnumber}>{idnumber}</p>
-                        ))}
-                     </div>
-                  </div>
-
-                  <div className="flex items-start gap-2">
                      <MapPin className="text-secondary mt-0.5" size={18} />
                      <div>
                         <p className="font-semibold text-gray-900">Location</p>
                         <p>{reservation.room.location}</p>
                      </div>
                   </div>
-               </div>
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-base">
+                     <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase">
+                        Purpose
+                     </p>
+                     <p className="mt-2 leading-7 text-gray-800">
+                        {reservation.purpose}
+                     </p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                     <UsersRound className="text-secondary mt-0.5" size={18} />
+                     <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                           <p className="font-semibold text-gray-900">
+                              Occupants
+                           </p>
+                           <p className="text-xs text-gray-500">
+                              {occupantsMap.size}{" "}
+                              {occupantsMap.size === 1 ? "person" : "people"}
+                           </p>
+                        </div>
+                        {occupantsMap.size > 0 ? (
+                           <div className="mt-3 grid gap-3 md:grid-cols-2">
+                              {[...occupantsMap.entries()]
+                                 .sort((a, b) => {
+                                    if (!a[1] && !b[1]) return -1;
+                                    if (a[1] && !b[1]) return -1;
+                                    if (!a[1] && b[1]) return 1;
 
-               <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase">
-                     Purpose
-                  </p>
-                  <p className="mt-2 leading-7 text-gray-800">
-                     {reservation.purpose}
-                  </p>
+                                    return a[1]!.firstname.localeCompare(
+                                       b[1]!.firstname,
+                                    );
+                                 })
+                                 .map(([idnumber, occupant]) => {
+                                    const fullName = occupant
+                                       ? [
+                                            occupant.firstname,
+                                            occupant.middlename,
+                                            occupant.lastname,
+                                         ]
+                                            .filter(Boolean)
+                                            .join(" ")
+                                       : null;
+
+                                    return (
+                                       <article
+                                          key={idnumber}
+                                          className={`rounded-lg border p-4 shadow-sm ${
+                                             occupant
+                                                ? "border-gray-200 bg-white"
+                                                : "border-amber-200 bg-amber-50"
+                                          }`}
+                                       >
+                                          <div className="flex items-start gap-3">
+                                             <div
+                                                className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
+                                                   occupant
+                                                      ? "bg-gray-100 text-gray-600"
+                                                      : "bg-amber-100 text-amber-700"
+                                                }`}
+                                             >
+                                                {occupant ? (
+                                                   <UserRound size={18} />
+                                                ) : (
+                                                   <UsersRound size={18} />
+                                                )}
+                                             </div>
+                                             <div className="min-w-0">
+                                                <p className="truncate font-semibold text-gray-900">
+                                                   {fullName ||
+                                                      "Unnamed occupant"}
+                                                </p>
+                                                <p className="mt-1 font-mono text-xs text-gray-500">
+                                                   ID {idnumber}
+                                                </p>
+                                             </div>
+                                          </div>
+                                          {occupant ? (
+                                             <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-3 border-t border-gray-100 pt-3 text-xs">
+                                                <div>
+                                                   <dt className="text-gray-500">
+                                                      Year level
+                                                   </dt>
+                                                   <dd className="mt-0.5 font-medium text-gray-800">
+                                                      {occupant.yearlevel ||
+                                                         "Not available"}
+                                                   </dd>
+                                                </div>
+                                                <div>
+                                                   <dt className="text-gray-500">
+                                                      Program
+                                                   </dt>
+                                                   <dd className="mt-0.5 truncate font-medium text-gray-800">
+                                                      {occupant.program.trim() ||
+                                                         "Not available"}
+                                                   </dd>
+                                                </div>
+                                                <div className="col-span-2 flex items-start gap-1.5">
+                                                   <div className="min-w-0">
+                                                      <dt className="text-gray-500">
+                                                         College
+                                                      </dt>
+                                                      <dd className="mt-0.5 truncate font-medium text-gray-800">
+                                                         {occupant.college.trim() ||
+                                                            "Not available"}
+                                                      </dd>
+                                                   </div>
+                                                </div>
+                                             </dl>
+                                          ) : (
+                                             <p className="mt-3 border-t border-amber-200 pt-3 text-xs leading-5 text-amber-800">
+                                                No student record was found for
+                                                this ID number.
+                                             </p>
+                                          )}
+                                       </article>
+                                    );
+                                 })}
+                           </div>
+                        ) : (
+                           <p className="mt-3 rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+                              No occupants have been added to this reservation.
+                           </p>
+                        )}
+                     </div>
+                  </div>
                </div>
             </section>
 
