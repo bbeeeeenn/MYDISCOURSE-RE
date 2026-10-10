@@ -1,16 +1,33 @@
 "use client";
 
+import { login } from "@/actions/login";
 import { roomsPage } from "@/constants";
-import { Lock, Mail, X, XCircle } from "lucide-react";
+import clsx from "clsx";
+import { LoaderCircle, Lock, Mail, X, XCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { SubmitEvent, useActionState, useEffect, useRef } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 export default function SigninModal() {
    const router = useRouter();
    const dialogRef = useRef<HTMLDialogElement>(null);
+   const [state, formAction, isPending] = useActionState(
+      async (_previousState: unknown, formData: FormData) => {
+         const result = await login(formData);
+         if (result.ok) {
+            window.location.assign(roomsPage);
+         }
+         return result;
+      },
+      undefined,
+   );
+
+   const preventWhilePending = (event: SubmitEvent<HTMLFormElement>) => {
+      if (isPending) event.preventDefault();
+   };
+
    useEffect(() => {
       dialogRef.current?.showModal();
    }, []);
@@ -35,13 +52,20 @@ export default function SigninModal() {
             <h1 className="mb-4 text-center text-xl font-medium text-gray-500">
                Log in to your account
             </h1>
-            <form action={() => {}}>
+            <form
+               action={formAction}
+               onSubmit={preventWhilePending}
+               aria-busy={isPending}
+            >
                <div className="flex items-center gap-1 rounded-sm border-2 border-gray-500 p-1 text-gray-500">
                   <span>
                      <Mail />
                   </span>
                   <input
                      type="email"
+                     name="email"
+                     required
+                     autoComplete="email"
                      className="grow text-lg"
                      spellCheck={false}
                      placeholder="Email"
@@ -53,12 +77,30 @@ export default function SigninModal() {
                   </span>
                   <input
                      type="password"
+                     name="password"
+                     required
+                     autoComplete="current-password"
                      className="grow text-lg"
                      placeholder="Password"
                   />
                </div>
-               <button className="mt-4 block w-full rounded-md bg-amber-400 py-2 font-medium shadow-sm">
-                  Log in
+               {state && !state.ok && (
+                  <p className="mt-3 text-sm text-red-700" role="alert">
+                     {state.message}
+                  </p>
+               )}
+               <button
+                  type="submit"
+                  disabled={isPending}
+                  className={clsx(
+                     "mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 py-2 font-medium shadow-sm",
+                     isPending && "cursor-wait opacity-75",
+                  )}
+               >
+                  {isPending && (
+                     <LoaderCircle className="animate-spin" size={18} />
+                  )}
+                  {isPending ? "Logging in" : "Log in"}
                </button>
             </form>
             <div className="my-4 flex items-center gap-2">

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileForm from "./_components/ProfileForm";
+import PasswordForm from "./_components/PasswordForm";
 import SignOutButton from "./_components/SignOutButton";
 import { Suspense } from "react";
 
@@ -27,10 +28,22 @@ async function Suspended() {
          name: true,
          email: true,
          role: true,
+         password: true,
       },
    });
    if (!user) redirect("/signin");
-   return <ProfileForm user={user} />;
+   return (
+      <>
+         <ProfileForm
+            user={{
+               name: user.name,
+               email: user.email,
+               role: user.role,
+            }}
+         />
+         <PasswordForm hasPassword={Boolean(user.password)} />
+      </>
+   );
 }
 
 function ProfileFallback() {
@@ -49,6 +62,7 @@ function ProfileFallback() {
                <div className="h-11 w-full rounded bg-gray-200" />
             </div>
          ))}
+         <div className="mt-4 h-32 rounded bg-gray-200" />
          <div className="h-4 w-32 rounded bg-gray-200" />
          <div className="h-10 w-full rounded-md bg-gray-200" />
       </div>

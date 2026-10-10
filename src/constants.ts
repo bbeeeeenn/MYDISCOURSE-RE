@@ -13,5 +13,6 @@ export const scanPage = "/scan";
 export const reportsPage = "/reports";
 export const reservationsPage = "/reservations";
 export const pastReservationsAdminPage = "/reservations/past";
+export const usersPageSize = 10;
 export const usersPage = "/users";
 export const profilePage = "/profile";

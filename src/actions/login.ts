@@ -5,9 +5,21 @@ import { AuthError } from "next-auth";
 export async function login(
   formData: FormData,
 ): ActionResult<{ message: string }> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+
+  if (!email || !password) {
+    return {
+      ok: false,
+      error: "VALIDATION",
+      message: "Email and password are required",
+    };
+  }
+
   try {
     await signIn("credentials", {
-      ...Object.fromEntries(formData.entries()),
+      email,
+      password,
       redirect: false,
     });
     return { ok: true, data: { message: "Logged in successfully" } };

@@ -13,6 +13,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       Google({
          clientId: process.env.AUTH_GOOGLE_CLIENT,
          clientSecret: process.env.AUTH_GOOGLE_SECRET,
+         allowDangerousEmailAccountLinking: true,
       }),
       Credentials({
          name: "credentials",
@@ -23,13 +24,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
          authorize: async (credentials) => {
             if (!credentials?.email || !credentials?.password) return null;
 
+            const email = String(credentials.email).trim().toLowerCase();
             const user = await prisma.user.findUnique({
-               where: {
-                  email: credentials.email as string,
-               },
+               where: { email },
             });
 
-            if (!user || !user.password) return null;
+            if (!user || !user.password || user.disabledAt) return null;
 
             const isValid = await bcrypt.compare(
                credentials.password as string,
@@ -47,6 +47,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }),
    ],
    callbacks: {
+      async signIn({ user }) {
+         if (!user.id) return false;
+
+         const account = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { disabledAt: true },
+         });
+
+         return !account?.disabledAt;
+      },
       async jwt({ token, user }) {
          if (user) {
             token.id = user.id as string;
