@@ -73,7 +73,7 @@ model User {
 
   name          String?
   password      String?
-  role          Role      @default(ADMIN) // Temporary
+  role          Role      @default(STUDENT) 
   disabledAt    DateTime?
 
   reservations Reservation[]
