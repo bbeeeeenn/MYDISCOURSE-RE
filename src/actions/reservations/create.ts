@@ -54,7 +54,10 @@ export default async function createReservation(
             message: "End time must be later than start time",
          };
       }
-      if (occupants.length === 0 || !purpose) {
+      if (
+         (occupants.length === 0 && session.user.role !== "ADMIN") ||
+         !purpose
+      ) {
          return {
             ok: false,
             error: "VALIDATION",

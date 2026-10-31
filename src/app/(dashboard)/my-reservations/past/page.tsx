@@ -5,14 +5,13 @@ import {
 } from "@/constants";
 import { getMyCompletedReservations } from "@/data-access-layer/reservations/myReservations";
 import getRooms from "@/data-access-layer/room/rooms";
-import ReservationFilters, {
-   formatFilterDate,
-} from "../../reservations/_components/ReservationFilters";
+import ReservationFilters from "../../reservations/_components/ReservationFilters";
 import { CalendarDays, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import Pagination from "../_components/Pagination";
 import ReservationCard from "../_components/ReservationCard";
+import { formatFilterDate } from "@/lib/date";
 
 function parsePage(value: string | undefined) {
    const page = Number.parseInt(value ?? "1", 10);

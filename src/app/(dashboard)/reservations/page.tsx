@@ -12,9 +12,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Pagination from "../my-reservations/_components/Pagination";
 import AdminReservationCard from "./_components/AdminReservationCard";
-import ReservationFilters, {
-   formatFilterDate,
-} from "./_components/ReservationFilters";
+import ReservationFilters from "./_components/ReservationFilters";
+import { formatFilterDate } from "@/lib/date";
 
 function parsePage(value: string | undefined) {
    const page = Number.parseInt(value ?? "1", 10);
