@@ -1,3 +1,5 @@
+import { format, isValid, parseISO } from "date-fns";
+
 export const philippineTimeZone = "Asia/Manila";
 const philippineOffset = "+08:00";
 
@@ -48,4 +50,10 @@ export function getPhilippineDateTimeInputs(value: Date) {
       date: `${values.year}-${values.month}-${values.day}`,
       time: `${values.hour}:${values.minute}`,
    };
+}
+
+export function formatFilterDate(date: string | undefined) {
+   if (!date) return undefined;
+   const parsedDate = parseISO(date);
+   return isValid(parsedDate) ? format(parsedDate, "yyyy-MM-dd") : undefined;
 }

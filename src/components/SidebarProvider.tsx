@@ -5,7 +5,6 @@ import {
    notificationsPage,
    myReservationsPage,
    roomsPage,
-   scanPage,
    reportsPage,
    reservationsPage,
    usersPage,
@@ -24,7 +23,6 @@ import {
    LogIn,
    LucideIcon,
    Menu,
-   QrCode,
    StickyNote,
    Tent,
    Users,
@@ -50,7 +48,6 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    ],
    STAFF: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
-      { icon: QrCode, label: "Scan", link: scanPage },
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
@@ -59,7 +56,6 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    ],
    ADMIN: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
-      { icon: QrCode, label: "Scan", link: scanPage },
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
