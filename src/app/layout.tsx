@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
          lang="en"
          className={clsx("h-full antialiased", outfitFont.variable)}
       >
-         <body className="bg-base-100 font-outfit flex min-h-full flex-col select-none">
+         <body className="font-outfit flex min-h-full flex-col bg-gray-50 select-none">
             <ToastContainer
                toastClassName={"select-none"}
                position="bottom-right"

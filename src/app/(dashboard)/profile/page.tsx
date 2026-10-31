@@ -8,7 +8,7 @@ import { Suspense } from "react";
 
 export default function AccountPage() {
    return (
-      <div className="relative min-h-[calc(100dvh-56px)] pb-11">
+      <div className="relative min-h-[calc(100dvh-56px)] pb-40">
          <Suspense fallback={<ProfileFallback />}>
             <Suspended />
          </Suspense>
