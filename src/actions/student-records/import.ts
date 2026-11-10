@@ -44,7 +44,7 @@ function validationError(message: string) {
 
 export default async function importStudentRecords(
    formData: FormData,
-): ActionResult<{ message: string; created: number; skipped: number }> {
+): ActionResult<{ message: string; imported: number }> {
    const session = await auth();
    if (session?.user.role !== "ADMIN") {
       return { ok: false, error: "FORBIDDEN", message: "Unauthorized" };
@@ -199,22 +199,39 @@ export default async function importStudentRecords(
       );
    }
 
+   let imported = 0;
    try {
-      const result = await prisma.studentRecord.createMany({
-         data: records,
-         skipDuplicates: true,
-      });
-      const skipped = records.length - result.count;
+      const batchSize = 500;
+      for (let index = 0; index < records.length; index += batchSize) {
+         const batch = records.slice(index, index + batchSize);
+         await prisma.$transaction(
+            batch.map((record) =>
+               prisma.studentRecord.upsert({
+                  where: { id_number: record.id_number },
+                  create: record,
+                  update: {
+                     firstname: record.firstname,
+                     middlename: record.middlename,
+                     lastname: record.lastname,
+                     yearlevel: record.yearlevel,
+                     college: record.college,
+                     program: record.program,
+                  },
+               }),
+            ),
+         );
+         imported += batch.length;
+      }
+
       revalidatePath(studentRecordsPage);
 
       return {
          ok: true,
          data: {
-            created: result.count,
-            skipped,
-            message: `Imported ${result.count} ${
-               result.count === 1 ? "student record" : "student records"
-            }${skipped > 0 ? `; skipped ${skipped} existing ID(s)` : ""}.`,
+            imported: records.length,
+            message: `Imported or updated ${records.length} ${
+               records.length === 1 ? "student record" : "student records"
+            }.`,
          },
       };
    } catch (error) {
@@ -222,7 +239,10 @@ export default async function importStudentRecords(
       return {
          ok: false,
          error: "DATABASE",
-         message: "Unable to import student records. Please try again.",
+         message:
+            imported > 0
+               ? `Import stopped after ${imported} records. Re-uploading the workbook is safe; matching IDs will be updated.`
+               : "Unable to import student records. Please try again.",
       };
    }
 }

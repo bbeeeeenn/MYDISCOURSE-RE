@@ -43,10 +43,14 @@ export default function ImportStudentRecords() {
                   <span className="font-medium text-gray-800">
                      id_number, firstname, lastname, yearlevel, college, program
                   </span>
-                  . The <span className="font-medium text-gray-800">middlename</span>{" "}
-                  column is optional. Existing ID numbers are skipped.
+                  . The{" "}
+                  <span className="font-medium text-gray-800">middlename</span>{" "}
+                  column is optional. Existing ID numbers are updated with the
+                  imported details; new IDs are added.
                </p>
-               <p className="mt-1">Maximum file size: 5 MB; maximum records: 20,000.</p>
+               <p className="mt-1">
+                  Maximum file size: 5 MB; maximum records: 20,000.
+               </p>
             </div>
             <label className="grid gap-1 text-sm font-medium text-gray-700">
                XLSX workbook
@@ -55,7 +59,7 @@ export default function ImportStudentRecords() {
                   name="file"
                   accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                   required
-                  className="w-full rounded-md border border-gray-300 bg-white p-2 text-sm font-normal file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:font-medium file:text-gray-700"
+                  className="w-full cursor-pointer rounded-md border border-gray-300 bg-white p-2 text-sm font-normal file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:font-medium file:text-gray-700"
                />
             </label>
             {state && !state.ok && (
@@ -71,7 +75,9 @@ export default function ImportStudentRecords() {
                   isPending && "opacity-75",
                )}
             >
-               {isPending && <LoaderCircle size={18} className="animate-spin" />}
+               {isPending && (
+                  <LoaderCircle size={18} className="animate-spin" />
+               )}
                {isPending ? "Importing records" : "Import XLSX"}
             </button>
          </form>

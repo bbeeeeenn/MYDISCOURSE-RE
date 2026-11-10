@@ -62,14 +62,18 @@ export default function StudentRecordDirectory({
                         </th>
                      </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 select-text">
                      {records.map((record) => (
                         <tr key={record.id_number}>
                            <td className="px-4 py-4 font-medium whitespace-nowrap text-gray-900">
                               {record.id_number}
                            </td>
                            <td className="px-4 py-4 font-semibold text-gray-900">
-                              {[record.firstname, record.middlename, record.lastname]
+                              {[
+                                 record.firstname,
+                                 record.middlename,
+                                 record.lastname,
+                              ]
                                  .filter(Boolean)
                                  .join(" ")}
                            </td>
