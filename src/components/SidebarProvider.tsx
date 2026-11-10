@@ -11,11 +11,13 @@ import {
    profilePage,
    signInPage,
    landingPage,
+   studentRecordsPage,
 } from "@/constants";
 import { Role } from "@/generated/prisma/enums";
 import clsx from "clsx";
 import {
    Bell,
+   BookUser,
    ChevronRight,
    CircleUserRound,
    DoorOpen,
@@ -33,7 +35,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
-type SidebarItem = { label: string; icon: LucideIcon; link: string };
+type SidebarItem = {
+   label: string;
+   icon: LucideIcon;
+   link: string;
+};
 
 const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    UNAUTHENTICATED: [
@@ -60,6 +66,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
       { icon: Bell, label: "Notifications", link: notificationsPage },
+      { icon: BookUser, label: "Student Records", link: studentRecordsPage },
       { icon: Users, label: "Users", link: usersPage },
       { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
@@ -142,8 +149,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                         inert={isActive}
                         className={clsx(
                            "flex items-center gap-2 px-3 py-3",
-                           isActive &&
-                              "pointer-events-none bg-gray-500 text-white",
+                           isActive
+                              ? "pointer-events-none bg-gray-500 text-white"
+                              : "hover:bg-gray-200",
                            i === items.length - 1 &&
                               item.link === profilePage &&
                               "mt-auto",

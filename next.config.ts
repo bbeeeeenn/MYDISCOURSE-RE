@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
    /* config options here */
    cacheComponents: true,
    allowedDevOrigins: ["shawlless-unregaled-benton.ngrok-free.dev"],
+   experimental: {
+      serverActions: {
+         bodySizeLimit: "6mb",
+      },
+   },
    images: {
       remotePatterns: [
          {

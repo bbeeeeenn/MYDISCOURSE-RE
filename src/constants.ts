@@ -15,4 +15,6 @@ export const reservationsPage = "/reservations";
 export const pastReservationsAdminPage = "/reservations/past";
 export const usersPageSize = 10;
 export const usersPage = "/users";
+export const studentRecordsPageSize = 10;
 export const profilePage = "/profile";
+export const studentRecordsPage = "/student-records";
