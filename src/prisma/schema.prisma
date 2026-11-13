@@ -14,53 +14,70 @@ enum Appliances {
 }
 
 model Room {
-  id String @id @default(cuid())
-  room_name String @unique
-  location String
-  capacity Int
-  createdAt DateTime @default(now())
-  image_url String?
-  image_public_id String?
+  id                   String       @id @default(cuid())
+  room_name            String       @unique
+  location             String
+  capacity             Int
+  createdAt            DateTime     @default(now())
+  image_url            String?
+  image_public_id      String?
   available_appliances Appliances[]
 
-  reservations Reservation[]
+  reservations  Reservation[]
+  notifications Notification[]
 
   @@map("rooms")
 }
 
 model Reservation {
-  id String @id @default(cuid())
-  roomId String
-  userId String // Reservation Creator
-  reservationDate DateTime @default(now())
-  startTime DateTime
-  endTime DateTime
-  occupants String[]
-  purpose String @db.Text
-  checkedInAt DateTime?
-  checkedOutAt DateTime?
+  id              String    @id @default(cuid())
+  roomId          String
+  userId          String // Reservation Creator
+  reservationDate DateTime  @default(now())
+  startTime       DateTime
+  endTime         DateTime
+  occupants       String[]
+  purpose         String    @db.Text
+  checkedInAt     DateTime?
+  checkedOutAt    DateTime?
 
   user User @relation(fields: [userId], references: [id])
   room Room @relation(fields: [roomId], references: [id])
+
+  notifications Notification[]
 
   @@index([roomId, reservationDate])
   @@map("reservations")
 }
 
 model StudentRecord {
-  id_number String @id
-  firstname String
+  id_number  String  @id
+  firstname  String
   middlename String?
-  lastname String
-  yearlevel Int
-  college String
-  program String
+  lastname   String
+  yearlevel  Int
+  college    String
+  program    String
 }
 
-enum Role {
-  ADMIN
-  STUDENT
-  STAFF
+enum NotificationType {
+  CHECKED_IN
+  CHECKED_OUT
+  OTHER
+}
+
+model Notification {
+  id      String           @id @default(cuid())
+  userId  String
+  type    NotificationType
+  message String
+
+  reservationId String?
+  roomId        String?
+
+  user           User         @relation(fields: [userId], references: [id])
+  reservationRef Reservation? @relation(fields: [reservationId], references: [id])
+  roomRef        Room?        @relation(fields: [roomId], references: [id])
 }
 
 model User {
@@ -71,15 +88,22 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  name          String?
-  password      String?
-  role          Role      @default(STUDENT) 
-  disabledAt    DateTime?
+  name       String?
+  password   String?
+  role       Role      @default(STUDENT)
+  disabledAt DateTime?
 
-  reservations Reservation[]
+  notifications Notification[]
+  reservations  Reservation[]
 
   @@index([role])
   @@map("users")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  STAFF
 }
 
 model Account {
