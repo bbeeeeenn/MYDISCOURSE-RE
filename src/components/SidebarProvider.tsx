@@ -16,7 +16,7 @@ import {
 import { Role } from "@/generated/prisma/enums";
 import clsx from "clsx";
 import {
-   Bell,
+   BellRing,
    BookUser,
    ChevronRight,
    CircleUserRound,
@@ -33,7 +33,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type SidebarItem = {
    label: string;
@@ -49,7 +49,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
    STUDENT: [
       { icon: DoorOpen, label: "Rooms", link: roomsPage },
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
-      { icon: Bell, label: "Notifications", link: notificationsPage },
+      // { icon: Bell, label: "Notifications", link: notificationsPage },
       { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
    STAFF: [
@@ -57,7 +57,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
-      { icon: Bell, label: "Notifications", link: notificationsPage },
+      // { icon: Bell, label: "Notifications", link: notificationsPage },
       { icon: CircleUserRound, label: "Profile", link: profilePage },
    ],
    ADMIN: [
@@ -65,7 +65,7 @@ const itemsFor: Record<Role | "UNAUTHENTICATED", SidebarItem[]> = {
       { icon: Tent, label: "My Reservations", link: myReservationsPage },
       { icon: Tent, label: "Reservations", link: reservationsPage },
       { icon: StickyNote, label: "Reports", link: reportsPage },
-      { icon: Bell, label: "Notifications", link: notificationsPage },
+      // { icon: Bell, label: "Notifications", link: notificationsPage },
       { icon: BookUser, label: "Student Records", link: studentRecordsPage },
       { icon: Users, label: "Users", link: usersPage },
       { icon: CircleUserRound, label: "Profile", link: profilePage },
@@ -78,6 +78,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
    const [mobile, setMobile] = useState(false);
    const [desktop, setDesktop] = useState(true);
+   const [notifCount, setNotifCount] = useState(0);
 
    const items: SidebarItem[] =
       session.status === "authenticated"
@@ -85,6 +86,27 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
          : session.status === "unauthenticated"
            ? itemsFor["UNAUTHENTICATED"]
            : [{ icon: DoorOpen, label: "Rooms", link: roomsPage }];
+
+   useEffect(() => {
+      const controller = new AbortController();
+      (async () => {
+         try {
+            if (!session.data) return;
+            const res = await fetch(
+               `/api/notification-count?id=${session.data.user.id}`,
+               { signal: controller.signal },
+            );
+            const data = await res.json();
+            if (data.ok) {
+               setNotifCount(data.count);
+            }
+         } catch (e) {
+            if (e instanceof DOMException && e.name === "AbortError") return;
+            console.error(e);
+         }
+      })();
+      return () => controller.abort();
+   }, [pathname, session.data]);
 
    return (
       <>
@@ -125,9 +147,17 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                   {items.find((i) => pathname.includes(i.link))?.label}
                </p>
                {session.status === "authenticated" && (
-                  <span className="text-base-100 ml-auto inline-block rounded-full bg-green-500 px-2 py-0.5 text-xs">
-                     {session.data.user.role}
-                  </span>
+                  <Link
+                     href={notificationsPage}
+                     className="relative ml-auto inline-block rounded-full border border-gray-400 bg-gray-300 p-1.5 text-xs text-gray-500"
+                  >
+                     {notifCount > 0 && (
+                        <div className="absolute -top-1 -right-1 flex size-4.5 items-center justify-center rounded-full border border-red-700 bg-red-500 text-white">
+                           {notifCount > 9 ? "9+" : notifCount}
+                        </div>
+                     )}
+                     <BellRing size={20} />
+                  </Link>
                )}
             </div>
 
