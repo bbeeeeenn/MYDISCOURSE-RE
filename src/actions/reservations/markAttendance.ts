@@ -1,6 +1,6 @@
 "use server";
 
-import { reservationsPage, roomsPage } from "@/constants";
+import { notificationsPage, reservationsPage, roomsPage } from "@/constants";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -29,6 +29,7 @@ export default async function markReservationAttendance(
    try {
       const reservation = await prisma.reservation.findUnique({
          where: { id },
+         include: { room: { select: { room_name: true } } },
       });
 
       if (!reservation) {
@@ -40,6 +41,13 @@ export default async function markReservationAttendance(
       }
 
       const now = new Date();
+      const notificationType =
+         action === "CHECK_IN" ? "CHECKED_IN" : "CHECKED_OUT";
+      const attendanceLabel = action === "CHECK_IN" ? "timed in" : "timed out";
+      const actorName = session.user.name?.trim();
+      const actorRole = session.user.role === "ADMIN" ? "admin" : "staff member";
+      const actor = actorName ? `${actorRole} ${actorName}` : actorRole;
+      const message = `Your reservation for ${reservation.purpose} in ${reservation.room.room_name} was ${attendanceLabel} by ${actor}.`;
 
       if (action === "CHECK_IN") {
          if (reservation.checkedInAt) {
@@ -58,14 +66,26 @@ export default async function markReservationAttendance(
             };
          }
 
-         await prisma.reservation.update({
-            where: { id },
-            data: { checkedInAt: now },
-         });
+         await prisma.$transaction([
+            prisma.reservation.update({
+               where: { id },
+               data: { checkedInAt: now },
+            }),
+            prisma.notification.create({
+               data: {
+                  userId: reservation.userId,
+                  type: notificationType,
+                  message,
+                  reservationId: id,
+                  roomId: reservation.roomId,
+               },
+            }),
+         ]);
 
          revalidatePath(reservationsPage);
          revalidatePath(roomsPage);
          revalidatePath(`/reservations/${id}`);
+         revalidatePath(notificationsPage);
 
          return {
             ok: true,
@@ -89,14 +109,26 @@ export default async function markReservationAttendance(
          };
       }
 
-      await prisma.reservation.update({
-         where: { id },
-         data: { checkedOutAt: now },
-      });
+      await prisma.$transaction([
+         prisma.reservation.update({
+            where: { id },
+            data: { checkedOutAt: now },
+         }),
+         prisma.notification.create({
+            data: {
+               userId: reservation.userId,
+               type: notificationType,
+               message,
+               reservationId: id,
+               roomId: reservation.roomId,
+            },
+         }),
+      ]);
 
       revalidatePath(reservationsPage);
       revalidatePath(roomsPage);
       revalidatePath(`${reservationsPage}/${id}`);
+      revalidatePath(notificationsPage);
 
       return {
          ok: true,

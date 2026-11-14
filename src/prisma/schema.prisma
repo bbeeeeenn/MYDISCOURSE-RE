@@ -67,10 +67,12 @@ enum NotificationType {
 }
 
 model Notification {
-  id      String           @id @default(cuid())
-  userId  String
-  type    NotificationType
-  message String
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
 
   reservationId String?
   roomId        String?
@@ -78,6 +80,16 @@ model Notification {
   user           User         @relation(fields: [userId], references: [id])
   reservationRef Reservation? @relation(fields: [reservationId], references: [id])
   roomRef        Room?        @relation(fields: [roomId], references: [id])
+
+  @@map("notifications")
+  @@index([userId, createdAt])
+  @@index([read])
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  STAFF
 }
 
 model User {
@@ -98,12 +110,6 @@ model User {
 
   @@index([role])
   @@map("users")
-}
-
-enum Role {
-  ADMIN
-  STUDENT
-  STAFF
 }
 
 model Account {
