@@ -3,7 +3,7 @@ import { notificationsPageSize } from "@/constants";
 import Pagination from "../my-reservations/_components/Pagination";
 import { getMyNotifications } from "@/data-access-layer/notifications/myNotifications";
 import NotificationCard from "./_components/NotificationCard";
-import MoreActionButtons from "./_components/RefreshButton";
+import MoreActionButtons from "./_components/ActionButtons";
 
 function parsePage(value: string | undefined) {
    const page = Number.parseInt(value ?? "1", 10);

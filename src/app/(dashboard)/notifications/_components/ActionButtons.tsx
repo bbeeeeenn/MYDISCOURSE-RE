@@ -4,7 +4,7 @@ import clearMyNotifications from "@/actions/notifications/clearMyNotifications";
 import clsx from "clsx";
 import { Ellipsis, LoaderCircle, RefreshCw, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 export default function MoreActionButtons() {
    const router = useRouter();
@@ -12,10 +12,28 @@ export default function MoreActionButtons() {
    const [clearingNotif, startClearingNotif] = useTransition();
    const [optionsIsOpen, setOptionsIsOpen] = useState(false);
 
+   const optionsRef = useRef<HTMLDivElement>(null);
+
    const onClearNotif = () =>
       startClearingNotif(async () => {
          await clearMyNotifications();
       });
+
+   useEffect(() => {
+      const func = (e: PointerEvent) => {
+         if (!optionsRef.current) return;
+
+         if (
+            e.target instanceof Node &&
+            !optionsRef.current.contains(e.target)
+         ) {
+            setOptionsIsOpen(false);
+         }
+      };
+      window.addEventListener("pointerdown", func);
+
+      return () => window.removeEventListener("pointerdown", func);
+   }, []);
 
    return (
       <div className="relative mb-4 flex justify-end gap-1.5">
@@ -32,13 +50,19 @@ export default function MoreActionButtons() {
             Refresh
          </button>
          <button
-            onClick={() => setOptionsIsOpen((prev) => !prev)}
+            onPointerDown={(e) => {
+               e.stopPropagation();
+               setOptionsIsOpen((prev) => !prev);
+            }}
             className="flex items-center justify-center gap-1 rounded-full border border-gray-300 bg-white px-2 py-1 text-sm"
          >
             <Ellipsis size={16} />
          </button>
          {optionsIsOpen && (
-            <div className="absolute top-[calc(100%+8px)] -right-1 rounded-md border border-gray-300 bg-white shadow-md">
+            <div
+               ref={optionsRef}
+               className="absolute top-[calc(100%+8px)] -right-1 rounded-md border border-gray-300 bg-white shadow-md"
+            >
                <button
                   onClick={onClearNotif}
                   disabled={clearingNotif}
