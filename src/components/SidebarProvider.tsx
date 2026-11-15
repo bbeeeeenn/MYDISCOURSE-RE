@@ -165,7 +165,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
             <aside
                inert={!mobile && !desktop}
                className={clsx(
-                  "pointer-events-auto flex w-full grow flex-col items-stretch border-r-amber-500 bg-gray-100 transition-[translate,width] sm:w-53 sm:border-r-4",
+                  "pointer-events-auto flex w-full grow flex-col items-stretch overflow-x-hidden border-r-amber-500 bg-gray-100 transition-[translate,width] sm:w-53 sm:border-r-4",
                   mobile ? "translate-x-0" : "-translate-x-full",
                   desktop ? "sm:translate-x-0" : "sm:-translate-x-full",
                )}

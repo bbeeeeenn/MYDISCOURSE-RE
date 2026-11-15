@@ -3,7 +3,7 @@ import { notificationsPageSize } from "@/constants";
 import Pagination from "../my-reservations/_components/Pagination";
 import { getMyNotifications } from "@/data-access-layer/notifications/myNotifications";
 import NotificationCard from "./_components/NotificationCard";
-import RefreshButton from "./_components/RefreshButton";
+import MoreActionButtons from "./_components/RefreshButton";
 
 function parsePage(value: string | undefined) {
    const page = Number.parseInt(value ?? "1", 10);
@@ -32,7 +32,7 @@ async function NotificationList({
                   {total} notifications
                </span>
             </header>
-            <RefreshButton />
+            <MoreActionButtons />
             {notifications.length > 0 ? (
                <div className="rounded-lg border border-gray-200 bg-white">
                   {notifications.map((item) => (
