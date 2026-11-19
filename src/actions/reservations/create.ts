@@ -76,17 +76,26 @@ export default async function createReservation(
          };
       }
 
-      const start = parsePhilippineDateTime(scheduledDate, startTime);
-      const end = parsePhilippineDateTime(scheduledDate, endTime);
+      const newSchedStartTime = parsePhilippineDateTime(
+         scheduledDate,
+         startTime,
+      );
+      const newSchedEndTime = parsePhilippineDateTime(scheduledDate, endTime);
       const now = new Date();
-      if (end <= now || addMinutes(start, 10) <= now) {
+      if (newSchedEndTime <= now || addMinutes(newSchedStartTime, 10) <= now) {
          return {
             ok: false,
             error: "VALIDATION",
             message: "The reservation time window has already passed",
          };
       }
-      if ((end.getTime() - start.getTime()) / 1000 / 60 / 60 > 2) {
+      if (
+         (newSchedEndTime.getTime() - newSchedStartTime.getTime()) /
+            1000 /
+            60 /
+            60 >
+         2
+      ) {
          return {
             ok: false,
             error: "VALIDATION",
@@ -97,11 +106,20 @@ export default async function createReservation(
       const overlap = await prisma.reservation.findFirst({
          where: {
             roomId,
-            startTime: { lt: end },
-            endTime: { gt: start },
-            checkedOutAt: { gt: start },
+            OR: [
+               {
+                  NOT: { checkedOutAt: null },
+                  startTime: { lt: newSchedEndTime },
+                  checkedOutAt: { gt: newSchedStartTime },
+               },
+               {
+                  startTime: { lt: newSchedEndTime },
+                  endTime: { gt: newSchedStartTime },
+               },
+            ],
          },
       });
+
       if (overlap) {
          return {
             ok: false,
@@ -114,8 +132,8 @@ export default async function createReservation(
          data: {
             roomId,
             userId,
-            startTime: start,
-            endTime: end,
+            startTime: newSchedStartTime,
+            endTime: newSchedEndTime,
             occupants,
             purpose,
          },
