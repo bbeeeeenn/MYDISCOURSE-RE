@@ -142,8 +142,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                      className="w-full"
                   />
                </Link>
-               <p className="text-2xl">/</p>
-               <p className="truncate font-medium">
+               {/* <p className="text-2xl">/</p> */}
+               <p className="truncate border-l-2 border-gray-400 pl-2 font-medium">
                   {items.find((i) => pathname.includes(i.link))?.label ??
                      (pathname === notificationsPage && "Notifications")}
                </p>
