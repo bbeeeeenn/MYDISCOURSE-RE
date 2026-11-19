@@ -144,7 +144,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                </Link>
                <p className="text-2xl">/</p>
                <p className="truncate font-medium">
-                  {items.find((i) => pathname.includes(i.link))?.label}
+                  {items.find((i) => pathname.includes(i.link))?.label ??
+                     (pathname === notificationsPage && "Notifications")}
                </p>
                {session.status === "authenticated" && (
                   <Link
