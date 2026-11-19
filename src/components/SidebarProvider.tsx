@@ -149,6 +149,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
                {session.status === "authenticated" && (
                   <Link
                      href={notificationsPage}
+                     onClick={() => setMobile(false)}
                      className="relative ml-auto inline-block rounded-full border border-gray-400 bg-gray-300 p-1.5 text-xs text-gray-500"
                   >
                      {notifCount > 0 && (

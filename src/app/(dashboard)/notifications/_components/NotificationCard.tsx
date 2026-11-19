@@ -1,6 +1,9 @@
+"use client";
+
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, LogIn, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type NotificationItem = {
    type: "CHECKED_IN" | "CHECKED_OUT" | "OTHER";
@@ -10,12 +13,25 @@ type NotificationItem = {
 };
 
 export default function NotificationCard({ item }: { item: NotificationItem }) {
+   const [distanceToNow, setDistanceToNow] = useState(
+      formatDistanceToNow(item.createdAt, { addSuffix: true }),
+   );
+
    const Icon =
       item.type === "CHECKED_IN"
          ? LogIn
          : item.type === "CHECKED_OUT"
            ? LogOut
            : Bell;
+
+   useEffect(() => {
+      const interval = setInterval(() => {
+         setDistanceToNow(
+            formatDistanceToNow(item.createdAt, { addSuffix: true }),
+         );
+      }, 1000 * 60);
+      return () => clearInterval(interval);
+   }, []);
 
    return (
       <article
@@ -35,7 +51,7 @@ export default function NotificationCard({ item }: { item: NotificationItem }) {
                dateTime={item.createdAt.toISOString()}
                className="mt-1 block text-xs text-gray-500"
             >
-               {formatDistanceToNow(item.createdAt, { addSuffix: true })}
+               {distanceToNow}
             </time>
          </div>
       </article>
