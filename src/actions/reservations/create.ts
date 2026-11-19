@@ -119,7 +119,6 @@ export default async function createReservation(
             ],
          },
       });
-
       if (overlap) {
          return {
             ok: false,
