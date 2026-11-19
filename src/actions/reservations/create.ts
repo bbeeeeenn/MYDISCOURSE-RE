@@ -103,18 +103,18 @@ export default async function createReservation(
          };
       }
 
+      // Checks for overlap
       const overlap = await prisma.reservation.findFirst({
          where: {
             roomId,
+            startTime: { lt: newSchedEndTime },
             OR: [
                {
-                  NOT: { checkedOutAt: null },
-                  startTime: { lt: newSchedEndTime },
-                  checkedOutAt: { gt: newSchedStartTime },
+                  checkedOutAt: null,
+                  endTime: { gt: newSchedStartTime },
                },
                {
-                  startTime: { lt: newSchedEndTime },
-                  endTime: { gt: newSchedStartTime },
+                  checkedOutAt: { gt: newSchedStartTime },
                },
             ],
          },
